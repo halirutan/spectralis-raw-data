@@ -2,7 +2,6 @@ package de.halirutan.spectralis.filestructure;
 
 import de.halirutan.spectralis.data.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -24,41 +23,48 @@ public enum FileHeaderContent {
     ScaleYSlo(new DoubleDataFragment()),
     FieldSizeSlo(new IntegerDataFragment()),
     ScanFocus(new DoubleDataFragment()),
-    ScanPosition(new ByteArrayDataFragment(4)),
-    ExamTime(new IntegerArrayDataFragment(2)),
+    ScanPosition(new StringDataFragment(4)),
+    ExamTime(new ExamTimeDataFragment()),
     ScanPattern(new IntegerDataFragment()),
     BScanHdrSize(new IntegerDataFragment()),
-    ID(new ByteArrayDataFragment(16)),
-    ReferenceID(new ByteArrayDataFragment(16)),
-    PID(new IntegerDataFragment()),
-    PatientID(new ByteArrayDataFragment(21)),
-    Padding(new ByteArrayDataFragment(3)),
-    DOB(new DateDataFragment()),
-    VID(new IntegerDataFragment()),
-    VisitID(new StringDataFragment(24)),
-    VisitDate(new DateDataFragment()),
-    GridType(new IntegerDataFragment()),
-    GridOffset(new IntegerDataFragment()),
-    GridType1(new IntegerDataFragment()),
-    GridOffset1(new IntegerDataFragment()),
-    ProgID(new ByteArrayDataFragment(34)),
-    Spare(new ByteArrayDataFragment(1790));
+    ID(new StringDataFragment(16)),
+    ReferenceID(new StringDataFragment(16)),
 
-    final Version version;
+    // Below here only from version 101
+    PID(new IntegerDataFragment(), HSFVersion.HSF_OCT_101),
+    PatientID(new StringDataFragment(21), HSFVersion.HSF_OCT_101),
+    Padding(new ByteArrayDataFragment(3), HSFVersion.HSF_OCT_101),
+    DOB(new DateDataFragment(), HSFVersion.HSF_OCT_101),
+    VID(new IntegerDataFragment(), HSFVersion.HSF_OCT_101),
+    VisitID(new StringDataFragment(24), HSFVersion.HSF_OCT_101),
+    VisitDate(new DateDataFragment(), HSFVersion.HSF_OCT_101),
+
+    // Below here only from version 102
+    GridType(new IntegerDataFragment(), HSFVersion.HSF_OCT_102),
+    GridOffset(new IntegerDataFragment(), HSFVersion.HSF_OCT_102),
+
+    // Below here only from version 103
+    GridType1(new IntegerDataFragment(),HSFVersion.HSF_OCT_103),
+    GridOffset1(new IntegerDataFragment(),HSFVersion.HSF_OCT_103),
+    ProgID(new StringDataFragment(34),HSFVersion.HSF_OCT_103);
+//    Spare(new ByteArrayDataFragment(1790));
+
+    final HSFVersion version;
     final DataFragment dataFragment;
 
     FileHeaderContent(DataFragment dataFragment) {
-        this.version = de.halirutan.spectralis.filestructure.Version.HSF_OCT_100;
+        this.version = HSFVersion.HSF_OCT_100;
         this.dataFragment = dataFragment;
     }
 
-    FileHeaderContent(DataFragment dataFragment, Version inVersion) {
+    FileHeaderContent(DataFragment dataFragment, HSFVersion inHSFVersion) {
         this.dataFragment = dataFragment;
-        this.version = inVersion;
+        this.version = inHSFVersion;
     }
 
-    void readData(RandomAccessFile f) throws IOException {
+    DataFragment readData(RandomAccessFile f) throws IOException {
         dataFragment.read(f);
+        return dataFragment;
     }
 
     public DataFragment getDataFragment() {

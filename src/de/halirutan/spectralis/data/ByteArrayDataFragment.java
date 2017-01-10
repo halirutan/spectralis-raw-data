@@ -22,10 +22,9 @@ public class ByteArrayDataFragment extends DataFragment<Byte[]> {
         byte read[] = new byte[myLength];
         Byte result[] = new Byte[myLength];
         file.read(read, 0, myLength);
-
         int i=0;
         for (byte b : read) {
-            result[i++] = b;
+            result[i] = b;
         }
         myValue = result;
         return result;
