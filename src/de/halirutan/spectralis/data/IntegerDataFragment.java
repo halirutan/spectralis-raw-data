@@ -16,7 +16,7 @@ public class IntegerDataFragment extends DataFragment<Integer> {
 
     @Override
     public Integer read(RandomAccessFile file) throws IOException {
-        ByteBuffer b = readIntoBuffer(file, 4);
+        ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Integer);
         myValue = b.getInt();
         return myValue;
     }

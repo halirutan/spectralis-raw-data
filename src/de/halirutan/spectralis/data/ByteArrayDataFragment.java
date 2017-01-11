@@ -19,9 +19,9 @@ public class ByteArrayDataFragment extends DataFragment<Byte[]> {
 
     @Override
     public Byte[] read(RandomAccessFile file) throws IOException {
-        byte read[] = new byte[myLength];
-        Byte result[] = new Byte[myLength];
-        file.read(read, 0, myLength);
+        byte read[] = new byte[myCount];
+        Byte result[] = new Byte[myCount];
+        file.read(read, 0, myCount);
         int i=0;
         for (byte b : read) {
             result[i] = b;

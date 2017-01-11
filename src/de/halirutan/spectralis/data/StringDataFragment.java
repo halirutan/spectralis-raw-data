@@ -9,14 +9,14 @@ import java.io.RandomAccessFile;
  */
 public class StringDataFragment extends DataFragment<String> {
 
-    public StringDataFragment(int myLength) {
-        super(myLength);
+    public StringDataFragment(int count) {
+        super(count);
     }
 
     @Override
     public String read(RandomAccessFile file) throws IOException {
-        byte result[] = new byte[myLength];
-        file.read(result, 0, myLength);
+        byte result[] = new byte[myCount];
+        file.read(result, 0, myCount);
         myValue = new String(result).trim();
         return myValue;
     }

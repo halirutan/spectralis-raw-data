@@ -20,14 +20,14 @@ import java.nio.ByteOrder;
  */
 public abstract class DataFragment<T> {
 
-    private static ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
+    private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
-    final int myLength;
+    final int myCount;
     T myValue = null;
 
 
-    DataFragment(int length) {
-        this.myLength = length;
+    DataFragment(int count) {
+        this.myCount = count;
     }
 
     /**
@@ -55,6 +55,20 @@ public abstract class DataFragment<T> {
         b.order(BYTE_ORDER);
         file.read(b.array(), 0, size);
         return b;
+    }
+
+    public static Integer getIntegerValue(DataFragment fragment) {
+        if (fragment instanceof IntegerDataFragment) {
+            return (Integer) fragment.getValue();
+        }
+        return null;
+    }
+
+    public static Float getFloatValue(DataFragment fragment) {
+        if (fragment instanceof FloatDataFragment) {
+            return (Float) fragment.getValue();
+        }
+        return null;
     }
 
 }

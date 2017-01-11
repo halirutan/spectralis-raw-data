@@ -21,7 +21,7 @@ public class SLOImageDataFragment extends DataFragment<SLOImage> {
 
     @Override
     public SLOImage read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myLength);
+        final ByteBuffer b = readIntoBuffer(file, myCount);
         return new SLOImage(myWidth, myHeight, b.array());
     }
 }

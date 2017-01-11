@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
  * Created by patrick on 09.01.17.
  * (c) Patrick Scheibe 2017
  */
-public enum FileHeaderContent {
+public enum FileHeaderContent implements HeaderContent{
     Version(new StringDataFragment(12)),
     SizeX(new IntegerDataFragment()),
     NumBScans(new IntegerDataFragment()),
@@ -49,8 +49,8 @@ public enum FileHeaderContent {
     ProgID(new StringDataFragment(34),HSFVersion.HSF_OCT_103);
 //    Spare(new ByteArrayDataFragment(1790));
 
-    final HSFVersion version;
-    final DataFragment dataFragment;
+    private final HSFVersion version;
+    private final DataFragment dataFragment;
 
     FileHeaderContent(DataFragment dataFragment) {
         this.version = HSFVersion.HSF_OCT_100;
@@ -62,7 +62,13 @@ public enum FileHeaderContent {
         this.version = inHSFVersion;
     }
 
-    DataFragment readData(RandomAccessFile f) throws IOException {
+
+    @Override
+    public HSFVersion getVersion() {
+        return version;
+    }
+
+    public DataFragment readData(RandomAccessFile f) throws IOException {
         dataFragment.read(f);
         return dataFragment;
     }

@@ -15,7 +15,7 @@ public class FloatDataFragment extends DataFragment<Float> {
 
     @Override
     public Float read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, 4);
+        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Float);
         myValue = b.getFloat();
         return myValue;
     }

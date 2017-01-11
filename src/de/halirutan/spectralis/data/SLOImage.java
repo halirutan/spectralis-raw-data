@@ -1,6 +1,5 @@
 package de.halirutan.spectralis.data;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;

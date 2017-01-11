@@ -3,7 +3,6 @@ package de.halirutan.spectralis.data;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -16,15 +15,15 @@ import java.time.temporal.ChronoUnit;
  */
 public class ExamTimeDataFragment extends DataFragment<LocalDateTime> {
 
-    private static LocalDateTime START_TIME = LocalDateTime.of(1601, 1, 1, 0, 0);
+    private static final LocalDateTime START_TIME = LocalDateTime.of(1601, 1, 1, 0, 0);
 
     public ExamTimeDataFragment() {
-        super(8);
+        super(1);
     }
 
     @Override
     public LocalDateTime read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myLength);
+        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.ExamTime);
         final long seconds = b.getLong()/10000000L;
         myValue = START_TIME.plus(seconds, ChronoUnit.SECONDS);
         return myValue;

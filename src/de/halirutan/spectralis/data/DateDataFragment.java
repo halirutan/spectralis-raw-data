@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
  */
 public class DateDataFragment extends DataFragment<LocalDateTime> {
     public DateDataFragment() {
-        super(8);
+        super(1);
     }
 
     @Override
     public LocalDateTime read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myLength);
+        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Date);
         myValue = COMDate.toLocalDateTime(b.getDouble());
         return myValue;
     }

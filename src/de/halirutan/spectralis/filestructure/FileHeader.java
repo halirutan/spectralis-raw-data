@@ -22,7 +22,7 @@ public class FileHeader {
 
     private RandomAccessFile myRandomAccessFile = null;
     private HSFVersion myHSFVersion = null;
-    public EnumMap<FileHeaderContent, DataFragment> myInfo = new EnumMap<>(FileHeaderContent.class);
+    public final EnumMap<FileHeaderContent, DataFragment> myInfo = new EnumMap<>(FileHeaderContent.class);
 
     private FileHeader() {    }
 
@@ -33,13 +33,13 @@ public class FileHeader {
         h.myRandomAccessFile = f;
         f.seek(HEADER_OFFSET);
         for (FileHeaderContent content : FileHeaderContent.values()) {
-            if (h.myHSFVersion.compareTo(content.version) < 0) break;
+            if (h.myHSFVersion.compareTo(content.getVersion()) < 0) break;
             h.myInfo.put(content, content.readData(f));
         }
         return h;
     }
 
-    public DataFragment getInfo(FileHeaderContent info) {
+    public DataFragment get(FileHeaderContent info) {
         return myInfo.get(info);
     }
 

@@ -15,7 +15,7 @@ public class DoubleDataFragment extends DataFragment<Double> {
 
     @Override
     public Double read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, 8);
+        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Double);
         myValue = b.getDouble();
         return myValue;
     }
