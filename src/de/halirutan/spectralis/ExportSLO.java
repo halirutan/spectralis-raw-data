@@ -1,6 +1,7 @@
 package de.halirutan.spectralis;
 
 import de.halirutan.spectralis.data.SLOImage;
+import de.halirutan.spectralis.filestructure.HSFFile;
 
 import javax.imageio.ImageIO;
 import java.io.File;

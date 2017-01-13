@@ -1,14 +1,12 @@
-package de.halirutan.spectralis;
+package de.halirutan.spectralis.filestructure;
 
 import de.halirutan.spectralis.data.DataFragment;
 import de.halirutan.spectralis.data.DataTypes;
 import de.halirutan.spectralis.data.SLOImage;
 import de.halirutan.spectralis.data.SLOImageDataFragment;
-import de.halirutan.spectralis.filestructure.BScan;
-import de.halirutan.spectralis.filestructure.FileHeader;
-import de.halirutan.spectralis.filestructure.FileHeaderContent;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -33,6 +31,26 @@ public class HSFFile {
         this.myFileHeader = myFileHeader;
         this.mySLOImage = mySLOImage;
         this.myBScans = bscans;
+    }
+
+    public static SLOImage readSLOImage(File file) {
+        SLOImage sloImage = null;
+        try {
+            if (file.exists() && file.canRead() && isValidHSFFile(file)) {
+                RandomAccessFile f = new RandomAccessFile(file, "r");
+                FileHeader header = FileHeader.readHeader(f);
+
+                int sloWidth = header.getIntegerValue(FileHeaderContent.SizeXSlo);
+                int sloHeight = header.getIntegerValue(FileHeaderContent.SizeYSlo);
+                f.seek(SLO_FILE_OFFSET);
+                SLOImageDataFragment sloFragment = new SLOImageDataFragment(sloWidth, sloHeight);
+                sloImage = sloFragment.read(f);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return sloImage;
     }
 
     public static HSFFile read(File file) {

@@ -1,7 +1,9 @@
-package de.halirutan.spectralis;
+package de.halirutan.spectralis.filestructure;
 
+import de.halirutan.spectralis.Util;
 import de.halirutan.spectralis.data.DataFragment;
 import de.halirutan.spectralis.filestructure.FileHeaderContent;
+import de.halirutan.spectralis.filestructure.HSFFile;
 import org.junit.Test;
 
 import java.io.File;

@@ -19,5 +19,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="org.apache.directory.studio:org.apache.commons.io:2.0.1" level="project" />
+    <orderEntry type="library" name="commons-io:commons-io:2.5" level="project" />
   </component>
 </module>
