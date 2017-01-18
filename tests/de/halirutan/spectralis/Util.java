@@ -17,9 +17,14 @@ public class Util {
         return new RandomAccessFile(f, "r");
     }
 
-    public static File getVolFile(String fileName) throws URISyntaxException {
+    public static File getVolFile(String fileName)  {
         final URL validURL = ClassLoader.getSystemResource(fileName);
-        return new File(validURL.toURI());
+        try {
+            return new File(validURL.toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
