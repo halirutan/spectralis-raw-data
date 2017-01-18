@@ -198,8 +198,12 @@ public class Controller implements Initializable {
                 if (img != null) {
                     final String outName = FilenameUtils.concat(outputDirectory.getAbsolutePath(), baseName + ".png");
                     try {
+                        File outFile = new File(outName);
+                        if (!outFile.canWrite()) {
+                            throw new Exception("Cannot create image file. Missing permissions?");
+                        }
                         ImageIO.write(img.getImage(), "png",
-                                new File(outName));
+                                outFile);
                         numOfExportedImages++;
                     } catch (IOException e) {
                         updateMessage("An error occurred when writing " + outName);
