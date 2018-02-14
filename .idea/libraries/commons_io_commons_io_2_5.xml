@@ -7,6 +7,7 @@
     <JAVADOC>
       <root url="jar://$PROJECT_DIR$/lib/commons-io-2.5-javadoc.jar!/" />
     </JAVADOC>
+    <MATHEMATICA_LIBRARY />
     <SOURCES />
   </library>
 </component>
