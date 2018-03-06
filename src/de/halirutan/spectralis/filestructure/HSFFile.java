@@ -1,5 +1,6 @@
 package de.halirutan.spectralis.filestructure;
 
+import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.data.DataFragment;
 import de.halirutan.spectralis.data.DataTypes;
 import de.halirutan.spectralis.data.Grid;
@@ -13,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by patrick on 10.01.17.
@@ -23,46 +25,50 @@ public class HSFFile {
     @SuppressWarnings("FieldCanBeLocal")
     private static final long SLO_FILE_OFFSET = 2048;
 
-    private final File myFile;
+    private RandomAccessFile myFile;
     private FileHeader myFileHeader;
     private SLOImage mySLOImage;
-    private ArrayList<BScan> myBScans;
 
-
-    private HSFFile(File myFile, FileHeader myFileHeader, SLOImage mySLOImage, ArrayList<BScan> bscans) {
-        this.myFile = myFile;
-        this.myFileHeader = myFileHeader;
-        this.mySLOImage = mySLOImage;
-        this.myBScans = bscans;
+    public HSFFile(final File file) throws SpectralisException {
+        try {
+            if (!FileHeader.isValidHSFFile(file)) {
+                throw new IOException("Invalid Heyex file");
+            }
+            myFile = new RandomAccessFile(file, "r");
+            myFileHeader = FileHeader.readHeader(myFile);
+        } catch (IOException e) {
+            throw new SpectralisException(e);
+        }
     }
 
-    public static SLOImage readSLOImage(File file) {
-        SLOImage sloImage = null;
-        try {
-            if (file.exists() && file.canRead() && isValidHSFFile(file)) {
-                RandomAccessFile f = new RandomAccessFile(file, "r");
-                FileHeader header = FileHeader.readHeader(f);
-
-                int sloWidth = header.getIntegerValue(FileHeaderContent.SizeXSlo);
-                int sloHeight = header.getIntegerValue(FileHeaderContent.SizeYSlo);
-                f.seek(SLO_FILE_OFFSET);
-                SLOImageDataFragment sloFragment = new SLOImageDataFragment(sloWidth, sloHeight);
-                sloImage = sloFragment.read(f);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public SLOImage getSLOImage() throws SpectralisException {
+        if (mySLOImage != null) {
+            return mySLOImage;
         }
-        return sloImage;
+        try {
+
+            int sloWidth = getSloWidth();
+            int sloHeight = getSloHeight();
+            myFile.seek(SLO_FILE_OFFSET);
+            SLOImageDataFragment sloFragment = new SLOImageDataFragment(sloWidth, sloHeight);
+            mySLOImage = sloFragment.read(myFile);
+        } catch (IOException e) {
+            throw new SpectralisException(e);
+        }
+        return mySLOImage;
+    }
+
+    public Integer getSloHeight() {
+        return myFileHeader.getIntegerValue(FileHeaderContent.SizeYSlo);
     }
 
     /**
      * Reads only the thickness-grid from an OCT file
      *
-     * @param file       HSF file
      * @param gridNumber Either 1 or 2 for the first or the second grid
      * @return The grid or null
      */
-    public static Grid readThicknessGrid(File file, int gridNumber) {
+    public Grid getThicknessGrid(int gridNumber) throws SpectralisException {
         FileHeaderContent gridTypeID;
         FileHeaderContent gridOffset;
         switch (gridNumber) {
@@ -75,62 +81,86 @@ public class HSFFile {
                 gridOffset = FileHeaderContent.GridOffset1;
                 break;
             default:
-                return null;
+                throw new SpectralisException("Invalid Grid number. Either 1 or 2 is allowed");
         }
         try {
-            if (file.exists() && file.canRead() && isValidHSFFile(file)) {
-                RandomAccessFile f = new RandomAccessFile(file, "r");
-                FileHeader header = FileHeader.readHeader(f);
-                final GridType gridType = GridType.getGridType(header.getIntegerValue(gridTypeID));
-                final Integer offset = header.getIntegerValue(gridOffset);
-                if (gridType != GridType.NO_GRID) {
-                    f.seek(offset);
-                    final GridDataFragment gridDataFragment = new GridDataFragment(gridType);
-                    return gridDataFragment.read(f);
-                }
+            final GridType gridType = GridType.getGridType(myFileHeader.getIntegerValue(gridTypeID));
+            final Integer offset = myFileHeader.getIntegerValue(gridOffset);
+            if (gridType != GridType.NO_GRID) {
+                myFile.seek(offset);
+                final GridDataFragment gridDataFragment = new GridDataFragment(gridType);
+                return gridDataFragment.read(myFile);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new SpectralisException(e);
         }
         return null;
     }
 
-    public static HSFFile read(File file) {
-        HSFFile inst = null;
-        try {
-            if (file.exists() && file.canRead() && isValidHSFFile(file)) {
-                RandomAccessFile f = new RandomAccessFile(file, "r");
-                FileHeader header = FileHeader.readHeader(f);
-
-                int sloWidth = header.getIntegerValue(FileHeaderContent.SizeXSlo);
-                int sloHeight = header.getIntegerValue(FileHeaderContent.SizeYSlo);
-                f.seek(SLO_FILE_OFFSET);
-                SLOImageDataFragment sloFragment = new SLOImageDataFragment(sloWidth, sloHeight);
-                final SLOImage sloImage = sloFragment.read(f);
-
-                final long offsetBScan = SLO_FILE_OFFSET + sloWidth * sloHeight;
-                final Integer sizeX = DataFragment.getIntegerValue(header.get(FileHeaderContent.SizeX));
-                final Integer sizeZ = DataFragment.getIntegerValue(header.get(FileHeaderContent.SizeZ));
-                final Integer bscanHdrSize = DataFragment.getIntegerValue(header.get(FileHeaderContent.BScanHdrSize));
-                final Integer numBScans = DataFragment.getIntegerValue(header.get(FileHeaderContent.NumBScans));
-
-                ArrayList<BScan> bscans = new ArrayList<>(numBScans);
-
-                for (int i = 0; i < numBScans; i++) {
-                    f.seek(offsetBScan + i * (bscanHdrSize + sizeX * sizeZ * DataTypes.Float));
-                    bscans.add(BScan.read(f, header));
-                }
-
-                inst = new HSFFile(file, header, sloImage, bscans);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return inst;
+    /**
+     * Get all BScans as list
+     * @return List of BScans
+     * @throws SpectralisException Error during reading
+     */
+    public List<BScan> getBScans() throws SpectralisException {
+        return getBScans(0, getNumBScans());
     }
 
-    public static boolean isValidHSFFile(String fileName) {
-        return isValidHSFFile(new File(fileName));
+    /**
+     * Get exactly one BScan
+     * @param i The BScan number to read
+     * @return BScan
+     * @throws SpectralisException Error during reading
+     */
+    public BScan getBScan(int i) throws SpectralisException {
+        final List<BScan> bScans = getBScans(i, 1);
+        return bScans.get(0);
+    }
+
+    private List<BScan> getBScans(int start, int count) throws SpectralisException {
+        try {
+            int sloWidth = getSloWidth();
+            int sloHeight = getSloHeight();
+            final long offsetBScan = SLO_FILE_OFFSET + sloWidth * sloHeight;
+            final Integer sizeX = getSizeX();
+            final Integer sizeZ = getSizeZ();
+            final Integer bScanHdrSize = getBScanHdrSize();
+            final Integer numBScans = getNumBScans();
+            if (start + count > numBScans) {
+                throw new SpectralisException("Not enough available BScans in dataset");
+            }
+
+            final ArrayList<BScan> bScans = new ArrayList<>(count);
+
+            for (int i = start; i < start+count; i++) {
+                myFile.seek(offsetBScan + i * (bScanHdrSize + sizeX * sizeZ * DataTypes.Float));
+                bScans.add(BScan.read(myFile, myFileHeader));
+            }
+            return bScans;
+        } catch (IOException e) {
+            throw new SpectralisException(e);
+        }
+    }
+
+
+    public Integer getSizeX() {
+        return DataFragment.getIntegerValue(myFileHeader.get(FileHeaderContent.SizeX));
+    }
+
+    public Integer getSizeZ() {
+        return DataFragment.getIntegerValue(myFileHeader.get(FileHeaderContent.SizeZ));
+    }
+
+    public Integer getBScanHdrSize() {
+        return DataFragment.getIntegerValue(myFileHeader.get(FileHeaderContent.BScanHdrSize));
+    }
+
+    public Integer getNumBScans() {
+        return DataFragment.getIntegerValue(myFileHeader.get(FileHeaderContent.NumBScans));
+    }
+
+    public Integer getSloWidth() {
+        return myFileHeader.getIntegerValue(FileHeaderContent.SizeXSlo);
     }
 
     public static boolean isValidHSFFile(File file) {
@@ -141,22 +171,4 @@ public class HSFFile {
         return myFileHeader;
     }
 
-    public SLOImage getSLOImage() {
-        return mySLOImage;
-    }
-
-    public ArrayList<BScan> getBScans() {
-        return myBScans;
-    }
-
-    public BScan getBScan(int i) {
-        if (i < myBScans.size()) {
-            return myBScans.get(i);
-        }
-        return null;
-    }
-
-    public String getFileName() {
-        return myFile.getName();
-    }
 }

@@ -17,7 +17,7 @@ public class GridMinPrinter {
         }
         final String fileName = args[0];
         final File file = new File(fileName);
-        final Grid grid = HSFFile.readThicknessGrid(file, 1);
+        final Grid grid = HSFFile.getThicknessGrid(file, 1);
         if (grid != null) {
             System.out.println(grid.getGridType().getDescription());
             if (grid instanceof CircularThicknessGrid) {

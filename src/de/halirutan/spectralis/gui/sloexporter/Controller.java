@@ -192,7 +192,8 @@ public class Controller implements Initializable {
             }
 
             for (File volFile : myRealVolFiles) {
-                SLOImage img = HSFFile.readSLOImage(volFile);
+                final HSFFile hsfFile = new HSFFile(volFile);
+                SLOImage img = hsfFile.getSLOImage();
                 final String baseName = FilenameUtils.getBaseName(volFile.getName());
                 updateMessage("Exporting SLO from " + baseName);
                 if (img != null) {
