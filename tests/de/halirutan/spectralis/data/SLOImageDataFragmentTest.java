@@ -1,10 +1,12 @@
 package de.halirutan.spectralis.data;
 
-import de.halirutan.spectralis.Util;
+import java.io.RandomAccessFile;
+
 import de.halirutan.spectralis.filestructure.FileHeader;
 import org.junit.Test;
 
-import java.io.RandomAccessFile;
+import static de.halirutan.spectralis.Util.VALID;
+import static de.halirutan.spectralis.Util.getVolRandomAccessFile;
 
 /**
  * Created by patrick on 10.01.17.
@@ -12,8 +14,8 @@ import java.io.RandomAccessFile;
  */
 public class SLOImageDataFragmentTest {
     @Test
-    public void read() throws Exception {
-        final RandomAccessFile volFile = Util.getVolRandomAccessFile("valid.vol");
+    public final void read() throws Exception {
+        RandomAccessFile volFile = getVolRandomAccessFile(VALID);
         FileHeader.readHeader(volFile);
     }
 

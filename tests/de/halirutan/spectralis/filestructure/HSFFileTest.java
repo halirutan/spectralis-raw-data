@@ -1,12 +1,10 @@
 package de.halirutan.spectralis.filestructure;
 
-import de.halirutan.spectralis.Util;
-import de.halirutan.spectralis.data.DataFragment;
-import de.halirutan.spectralis.filestructure.FileHeaderContent;
-import de.halirutan.spectralis.filestructure.HSFFile;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
+import static de.halirutan.spectralis.Util.VALID;
+import static de.halirutan.spectralis.Util.getVolFile;
 
 /**
  * Created by patrick on 10.01.17.
@@ -14,21 +12,11 @@ import java.io.File;
  */
 public class HSFFileTest {
     @Test
-    public void read() throws Exception {
-        final HSFFile hsfFile = HSFFile.read(Util.getVolFile("valid.vol"));
-        hsfFile.getFileName();
-
+    public final void read() throws Exception {
+        HSFFile hsfFile = new HSFFile(getVolFile(VALID));
+        Assert.assertNotNull("HSF File is null", hsfFile);
+        Assert.assertNotNull("Header is null", hsfFile.getFileHeader());
     }
 
-    @Test
-    public void testLargeFile() throws Exception {
-        File f = new File("/home/patrick/Documents/trm/projects/2015/rauscher/data/testSubjects/B_1051_Heider_S_1078412.vol");
-        long starTime = System.nanoTime();
-        final HSFFile hsfFile = HSFFile.read(f);
-        long endTime = System.nanoTime();
-        System.out.println(DataFragment.getIntegerValue(hsfFile.getFileHeader().get(FileHeaderContent.NumBScans)));
-        System.out.println("runtime in ms = " + (endTime - starTime) / 1000000);
-
-    }
 
 }

@@ -10,12 +10,19 @@ public enum HSFVersion {
     HSF_OCT_102("HSF-OCT-102", 2),
     HSF_OCT_103("HSF-OCT-103", 3);
 
-    String myVersionString;
-    int myVersionNumber;
+    private final String versionString;
+    private final int version;
 
-    HSFVersion(String versionString, int versionNumber) {
-        myVersionString = versionString;
-        myVersionNumber = versionNumber;
+    HSFVersion(String name, int number) {
+        versionString = name;
+        version = number;
     }
 
+    public String getVersionString() {
+        return versionString;
+    }
+
+    public int getVersion() {
+        return version;
+    }
 }

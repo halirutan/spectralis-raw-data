@@ -21,7 +21,16 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="commons-io:commons-io:2.5" level="project" />
-    <orderEntry type="library" name="JLink" level="application" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <MATHEMATICA_LIBRARY />
+        <SOURCES />
+        <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
+      </library>
+    </orderEntry>
   </component>
 </module>

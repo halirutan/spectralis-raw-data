@@ -1,6 +1,7 @@
 package de.halirutan.spectralis.filestructure;
 
 import com.sun.istack.internal.Nullable;
+import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.data.DataFragment;
 import de.halirutan.spectralis.data.FloatDataFragment;
 import de.halirutan.spectralis.data.IntegerDataFragment;
@@ -66,7 +67,7 @@ public class FileHeader {
         StringDataFragment version = new StringDataFragment(12);
         String versionString = version.read(f);
         for (HSFVersion value : HSFVersion.values()) {
-            if (value.myVersionString.equals(versionString)) {
+            if (value.getVersionString().equals(versionString)) {
                 result = value;
                 break;
             }

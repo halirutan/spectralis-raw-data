@@ -11,20 +11,25 @@ import java.net.URL;
  * (c) Patrick Scheibe 2017
  */
 public class Util {
+    public static final String VALID = "valid.vol";
+    public static final String INVALID = "invalid.vol";
+    public static final String WILLIS_712 = "Willis_B_712.vol";
+    public static final String WILLIS_713 = "Willis_B_713.vol";
+    public static final String WILLIS_714 = "Willis_B_714.vol";
+    public static final String WILLIS_715 = "Willis_B_715.vol";
+    public static final String WILLIS_716_0 = "Willis_B_716_0.vol";
+    public static final String WILLIS_716_2 = "Willis_B_716_2.vol";
+    public static final String WILLIS_716_4 = "Willis_B_716_4.vol";
 
-    public static RandomAccessFile getVolRandomAccessFile(String fileName) throws URISyntaxException, FileNotFoundException {
-        final File f = getVolFile(fileName);
-        return new RandomAccessFile(f, "r");
+
+    public static RandomAccessFile getVolRandomAccessFile(String  fileName) throws FileNotFoundException, URISyntaxException {
+        File volFile = getVolFile(fileName);
+        return new RandomAccessFile(volFile, "r");
     }
 
-    public static File getVolFile(String fileName)  {
-        final URL validURL = ClassLoader.getSystemResource(fileName);
-        try {
+    public static File getVolFile(String fileName) throws URISyntaxException {
+            URL validURL = ClassLoader.getSystemResource(fileName);
             return new File(validURL.toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
 }
