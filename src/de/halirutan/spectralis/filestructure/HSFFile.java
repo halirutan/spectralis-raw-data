@@ -35,7 +35,7 @@ public class HSFFile {
                 throw new SpectralisException("Invalid Heyex file");
             }
             file = new RandomAccessFile(inFile, "r");
-            fileHeader = FileHeader.readHeader(file);
+            fileHeader = new FileHeader(file);
         } catch (IOException e) {
             throw new SpectralisException(e);
         }
@@ -144,7 +144,7 @@ public class HSFFile {
 
 
     public final Integer getSizeX() {
-        return DataFragment.getIntegerValue(fileHeader.get(FileHeaderContent.SizeX));
+        return fileHeader.get(FileHeaderContent.SizeX).getValue();
     }
 
     public final Integer getSizeZ() {

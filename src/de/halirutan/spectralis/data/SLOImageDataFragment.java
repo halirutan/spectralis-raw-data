@@ -13,15 +13,18 @@ public class SLOImageDataFragment extends DataFragment<SLOImage> {
     private final int myHeight;
     private final int myWidth;
 
+    private SLOImageDataFragment() {
+        this(0, 0);
+    };
+
     public SLOImageDataFragment(int width, int height) {
-        super(width*height);
         myWidth = width;
         myHeight = height;
     }
 
     @Override
-    public SLOImage read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount);
-        return new SLOImage(myWidth, myHeight, b.array());
+    public final SLOImage read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, myHeight*myWidth);
+        return new SLOImage(myWidth, myHeight, buffer.array());
     }
 }

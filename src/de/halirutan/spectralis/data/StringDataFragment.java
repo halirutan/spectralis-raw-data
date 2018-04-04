@@ -2,6 +2,7 @@ package de.halirutan.spectralis.data;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.Charset;
 
 /**
  * Created by patrick on 09.01.17.
@@ -9,15 +10,20 @@ import java.io.RandomAccessFile;
  */
 public class StringDataFragment extends DataFragment<String> {
 
+    private final int size;
+
+    public StringDataFragment() {
+        size = 1;
+    }
+
     public StringDataFragment(int count) {
-        super(count);
+        size = count;
     }
 
     @Override
-    public String read(RandomAccessFile file) throws IOException {
-        byte result[] = new byte[myCount];
-        file.read(result, 0, myCount);
-        myValue = new String(result).trim();
-        return myValue;
+    public final String read(RandomAccessFile file) throws IOException {
+        byte result[] = new byte[size];
+        file.read(result, 0, size);
+        return new String(result, Charset.forName("US-ASCII")).trim();
     }
 }

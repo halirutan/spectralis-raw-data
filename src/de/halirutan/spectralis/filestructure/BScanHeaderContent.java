@@ -50,8 +50,8 @@ public enum  BScanHeaderContent implements HeaderContent{
         return version;
     }
 
-    public DataFragment readData(RandomAccessFile f) throws IOException {
-        dataFragment.read(f);
+    public DataFragment readData(RandomAccessFile file) throws IOException {
+        dataFragment.read(file);
         return dataFragment;
     }
 

@@ -22,13 +22,6 @@ public abstract class DataFragment<T> {
 
     private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
 
-    final int myCount;
-    T myValue = null;
-
-
-    DataFragment(int count) {
-        this.myCount = count;
-    }
 
     /**
      * Reads the specific type from a binary file at the current file position
@@ -38,11 +31,6 @@ public abstract class DataFragment<T> {
      */
     public abstract T read(RandomAccessFile file) throws IOException;
 
-    @Nullable
-    public T getValue() {
-        return myValue;
-    }
-
     /**
      * Reading bytes from a file into a {@link ByteBuffer}
      * @param file Opened and readable file
@@ -50,25 +38,25 @@ public abstract class DataFragment<T> {
      * @return The bytes read, wrapped into a {@link ByteBuffer}
      * @throws IOException if something went wrong during reading
      */
-    ByteBuffer readIntoBuffer(RandomAccessFile file, int size) throws IOException {
-        ByteBuffer b = ByteBuffer.allocate(size);
-        b.order(BYTE_ORDER);
-        file.read(b.array(), 0, size);
-        return b;
+    static ByteBuffer readIntoBuffer(RandomAccessFile file, int size) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(size);
+        buffer.order(BYTE_ORDER);
+        file.read(buffer.array(), 0, size);
+        return buffer;
     }
 
-    public static Integer getIntegerValue(DataFragment fragment) {
-        if (fragment instanceof IntegerDataFragment) {
-            return (Integer) fragment.getValue();
-        }
-        return null;
-    }
-
-    public static Float getFloatValue(DataFragment fragment) {
-        if (fragment instanceof FloatDataFragment) {
-            return (Float) fragment.getValue();
-        }
-        return null;
-    }
+//    public static Integer getIntegerValue(DataFragment fragment) {
+//        if (fragment instanceof IntegerDataFragment) {
+//            return (Integer) fragment.getValue();
+//        }
+//        return null;
+//    }
+//
+//    public static Float getFloatValue(DataFragment fragment) {
+//        if (fragment instanceof FloatDataFragment) {
+//            return (Float) fragment.getValue();
+//        }
+//        return null;
+//    }
 
 }

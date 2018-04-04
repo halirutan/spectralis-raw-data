@@ -16,16 +16,13 @@ import java.time.temporal.ChronoUnit;
 public class ExamTimeDataFragment extends DataFragment<LocalDateTime> {
 
     private static final LocalDateTime START_TIME = LocalDateTime.of(1601, 1, 1, 0, 0);
-
-    public ExamTimeDataFragment() {
-        super(1);
-    }
+    private static final long SCALE = 10000000L;
 
     @Override
-    public LocalDateTime read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.ExamTime);
-        final long seconds = b.getLong()/10000000L;
-        myValue = START_TIME.plus(seconds, ChronoUnit.SECONDS);
-        return myValue;
+    public final LocalDateTime read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, DataTypes.ExamTime);
+        long seconds = buffer.getLong()/ SCALE;
+        return START_TIME.plus(seconds, ChronoUnit.SECONDS);
     }
+
 }

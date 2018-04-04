@@ -10,23 +10,25 @@ import java.nio.ByteBuffer;
  */
 public class FloatArrayDataFragment extends DataFragment<Float[]> {
 
+    private final int size;
+
     public FloatArrayDataFragment() {
-        super(1);
+        this(1);
     }
 
     public FloatArrayDataFragment(int length) {
-        super(length);
+        size = length;
     }
 
     @Override
-    public Float[] read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount * DataTypes.Float);
-        Float result[] = new Float[myCount];
-        for (int i = 0; i < myCount; i++) {
-            result[i] = b.getFloat(i * DataTypes.Float);
+    public final Float[] read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, size * DataTypes.Float);
+        Float[] contents = new Float[size];
+        for (int i = 0; i < size; i++) {
+            contents[i] = buffer.getFloat(i * DataTypes.Float);
 
         }
-        myValue = result;
-        return myValue;
+        return contents;
     }
+
 }

@@ -9,14 +9,11 @@ import java.nio.ByteBuffer;
  * (c) Patrick Scheibe 2017
  */
 public class DoubleDataFragment extends DataFragment<Double> {
-    public DoubleDataFragment() {
-        super(1);
-    }
+
 
     @Override
-    public Double read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Double);
-        myValue = b.getDouble();
-        return myValue;
+    public final Double read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, DataTypes.Double);
+        return buffer.getDouble();
     }
 }

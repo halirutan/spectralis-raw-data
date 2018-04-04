@@ -10,14 +10,11 @@ import java.time.LocalDateTime;
  * (c) Patrick Scheibe 2017
  */
 public class DateDataFragment extends DataFragment<LocalDateTime> {
-    public DateDataFragment() {
-        super(1);
-    }
+
 
     @Override
-    public LocalDateTime read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Date);
-        myValue = COMDate.toLocalDateTime(b.getDouble());
-        return myValue;
+    public final LocalDateTime read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, DataTypes.Date);
+        return COMDate.toLocalDateTime(buffer.getDouble());
     }
 }

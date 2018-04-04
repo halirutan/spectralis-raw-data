@@ -10,14 +10,10 @@ import java.nio.ByteBuffer;
  */
 public class IntegerDataFragment extends DataFragment<Integer> {
 
-    public IntegerDataFragment() {
-        super(1);
+    @Override
+    public final Integer read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, DataTypes.Integer);
+        return buffer.getInt();
     }
 
-    @Override
-    public Integer read(RandomAccessFile file) throws IOException {
-        ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Integer);
-        myValue = b.getInt();
-        return myValue;
-    }
 }

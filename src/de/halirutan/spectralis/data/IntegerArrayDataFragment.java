@@ -10,22 +10,24 @@ import java.nio.ByteBuffer;
  */
 public class IntegerArrayDataFragment extends DataFragment<Integer[]> {
 
+    private final int size;
+
     public IntegerArrayDataFragment() {
-        super(1);
+        this(1);
     }
 
     public IntegerArrayDataFragment(int length) {
-        super(length);
+        size = length;
     }
 
     @Override
-    public Integer[] read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount * DataTypes.Integer);
-        Integer result[] = new Integer[myCount];
-        for (int i = 0; i < myCount; i++) {
-            result[i] = b.getInt(i*DataTypes.Integer);
+    public final Integer[] read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, size * DataTypes.Integer);
+        Integer[] contents = new Integer[size];
+        for (int i = 0; i < size; i++) {
+            contents[i] = buffer.getInt(i*DataTypes.Integer);
         }
-        myValue = result;
-        return myValue;
+        return contents;
     }
+
 }

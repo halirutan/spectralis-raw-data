@@ -9,14 +9,11 @@ import java.nio.ByteBuffer;
  * (c) Patrick Scheibe 2017
  */
 public class FloatDataFragment extends DataFragment<Float> {
-    public FloatDataFragment() {
-        super(1);
-    }
 
     @Override
-    public Float read(RandomAccessFile file) throws IOException {
-        final ByteBuffer b = readIntoBuffer(file, myCount *DataTypes.Float);
-        myValue = b.getFloat();
-        return myValue;
+    public final Float read(RandomAccessFile file) throws IOException {
+        ByteBuffer buffer = readIntoBuffer(file, DataTypes.Float);
+        return buffer.getFloat();
     }
+
 }

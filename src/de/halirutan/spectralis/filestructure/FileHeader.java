@@ -1,7 +1,6 @@
 package de.halirutan.spectralis.filestructure;
 
 import com.sun.istack.internal.Nullable;
-import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.data.DataFragment;
 import de.halirutan.spectralis.data.FloatDataFragment;
 import de.halirutan.spectralis.data.IntegerDataFragment;
@@ -11,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Created by patrick on 09.01.17.
@@ -21,24 +21,31 @@ public class FileHeader {
     private static final long VERSION_OFFSET = 0;
     private static final long HEADER_OFFSET = 0;
 
-    private RandomAccessFile myRandomAccessFile = null;
-    private HSFVersion myHSFVersion = null;
-    public final EnumMap<FileHeaderContent, DataFragment> myInfo = new EnumMap<>(FileHeaderContent.class);
+    private final RandomAccessFile file;
+    private final HSFVersion myHSFVersion;
+    private final Map<FileHeaderContent, DataFragment> myInfo = new EnumMap<>(FileHeaderContent.class);
 
-    private FileHeader() {    }
-
-    public static FileHeader readHeader(RandomAccessFile f) throws IOException {
-        FileHeader h = new FileHeader();
-        f.seek(VERSION_OFFSET);
-        h.myHSFVersion = readVersion(f);
-        h.myRandomAccessFile = f;
-        f.seek(HEADER_OFFSET);
-        for (FileHeaderContent content : FileHeaderContent.values()) {
-            if (h.myHSFVersion.compareTo(content.getVersion()) < 0) break;
-            h.myInfo.put(content, content.readData(f));
+    FileHeader(RandomAccessFile inFile) throws IOException {
+        file = inFile;
+        file.seek(VERSION_OFFSET);
+        myHSFVersion = readVersion(file);
+        if (myHSFVersion == null) {
+            throw new IOException("Invalid file");
         }
-        return h;
+
+        file.readInt();
+
+
+
+
+
+        for (FileHeaderContent content : FileHeaderContent.values()) {
+            if (myHSFVersion.compareTo(content.getVersion()) < 0) break;
+            myInfo.put(content, content.readData(this.file));
+        }
+        int test = FileHeaderContent.GridType.getDataFragment().read(this.file);
     }
+
 
     public DataFragment get(FileHeaderContent info) {
         return myInfo.get(info);
@@ -59,9 +66,8 @@ public class FileHeader {
     }
 
 
-
     private static HSFVersion readVersion(RandomAccessFile f) throws IOException {
-        final long oldPosition = f.getFilePointer();
+        long oldPosition = f.getFilePointer();
         f.seek(0);
         HSFVersion result = null;
         StringDataFragment version = new StringDataFragment(12);
@@ -77,21 +83,19 @@ public class FileHeader {
     }
 
     @Nullable
-    public static HSFVersion readVersion(File file) throws IOException {
+    private static HSFVersion readVersion(File file) throws IOException {
         HSFVersion version = null;
         if (file.canRead()) {
             RandomAccessFile f = new RandomAccessFile(file, "r");
             version = readVersion(f);
-
         }
         return version;
     }
 
-    public static boolean isValidHSFFile(File file) {
+    static boolean isValidHSFFile(File file) {
         try {
             return readVersion(file) != null;
         } catch (IOException e) {
-            e.printStackTrace();
             return false;
         }
     }

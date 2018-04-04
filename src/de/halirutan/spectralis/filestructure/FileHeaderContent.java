@@ -1,14 +1,21 @@
 package de.halirutan.spectralis.filestructure;
 
-import de.halirutan.spectralis.data.*;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
+
+import de.halirutan.spectralis.data.ByteArrayDataFragment;
+import de.halirutan.spectralis.data.DataFragment;
+import de.halirutan.spectralis.data.DateDataFragment;
+import de.halirutan.spectralis.data.DoubleDataFragment;
+import de.halirutan.spectralis.data.ExamTimeDataFragment;
+import de.halirutan.spectralis.data.IntegerDataFragment;
+import de.halirutan.spectralis.data.StringDataFragment;
 
 /**
  * Created by patrick on 09.01.17.
  * (c) Patrick Scheibe 2017
  */
+@SuppressWarnings({"FieldNamingConvention", "EnumClass"})
 public enum FileHeaderContent implements HeaderContent{
     Version(new StringDataFragment(12)),
     SizeX(new IntegerDataFragment()),
@@ -52,14 +59,14 @@ public enum FileHeaderContent implements HeaderContent{
     private final HSFVersion version;
     private final DataFragment dataFragment;
 
-    FileHeaderContent(DataFragment dataFragment) {
-        this.version = HSFVersion.HSF_OCT_100;
-        this.dataFragment = dataFragment;
+    FileHeaderContent(DataFragment df) {
+        version = HSFVersion.HSF_OCT_100;
+        dataFragment = df;
     }
 
-    FileHeaderContent(DataFragment dataFragment, HSFVersion inHSFVersion) {
-        this.dataFragment = dataFragment;
-        this.version = inHSFVersion;
+    FileHeaderContent(DataFragment df, HSFVersion inHSFVersion) {
+        dataFragment = df;
+        version = inHSFVersion;
     }
 
 
@@ -68,8 +75,8 @@ public enum FileHeaderContent implements HeaderContent{
         return version;
     }
 
-    public DataFragment readData(RandomAccessFile f) throws IOException {
-        dataFragment.read(f);
+    public DataFragment readData(RandomAccessFile file) throws IOException {
+        dataFragment.read(file);
         return dataFragment;
     }
 

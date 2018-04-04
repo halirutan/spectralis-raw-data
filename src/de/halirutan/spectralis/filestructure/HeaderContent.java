@@ -13,7 +13,7 @@ interface HeaderContent {
 
     HSFVersion getVersion();
 
-    DataFragment readData(RandomAccessFile f) throws IOException;
+    DataFragment readData(RandomAccessFile file) throws IOException;
 
     DataFragment getDataFragment();
 

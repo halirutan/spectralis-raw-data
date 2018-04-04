@@ -9,15 +9,10 @@ import java.io.RandomAccessFile;
  */
 public class SectorDataFragment extends DataFragment<Sector> {
 
-    SectorDataFragment() {
-        super(1);
-    }
-
     @Override
-    public Sector read(RandomAccessFile file) throws IOException {
-        final Float thickness = (new FloatDataFragment()).read(file);
-        final Float volume = (new FloatDataFragment()).read(file);
+    public final Sector read(RandomAccessFile file) throws IOException {
+        Float thickness = (new FloatDataFragment()).read(file);
+        Float volume = (new FloatDataFragment()).read(file);
         return new Sector(thickness, volume);
-
     }
 }

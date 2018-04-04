@@ -12,22 +12,21 @@ public class GridDataFragment extends DataFragment<Grid> {
     private GridType myType;
 
     public GridDataFragment(GridType type) {
-        super(1);
         myType = type;
     }
 
     @Override
-    public Grid read(RandomAccessFile file) throws IOException {
-        final IntegerDataFragment intDF = new IntegerDataFragment();
-        final DoubleDataFragment doubleDF = new DoubleDataFragment();
-        final FloatDataFragment floatDF = new FloatDataFragment();
-        final SectorDataFragment sectorDF = new SectorDataFragment();
+    public final Grid read(RandomAccessFile file) throws IOException {
+        IntegerDataFragment intDF = new IntegerDataFragment();
+        DoubleDataFragment doubleDF = new DoubleDataFragment();
+        FloatDataFragment floatDF = new FloatDataFragment();
+        SectorDataFragment sectorDF = new SectorDataFragment();
 
         switch (myType) {
             case CIRCULAR1:
             case CIRCULAR2:
             case CIRCULAR_ETDRS:
-                final CircularThicknessGrid circularGrid = new CircularThicknessGrid(myType);
+                CircularThicknessGrid circularGrid = new CircularThicknessGrid(myType);
                 circularGrid.myTypeID = intDF.read(file);
                 circularGrid.myDiameters = new double[3];
                 for (int i = 0; i < 3; i++) {
@@ -48,7 +47,7 @@ public class GridDataFragment extends DataFragment<Grid> {
             case RECTANGULAR_15:
             case RECTANGULAR_20:
             case RECTANGULAR_POLE:
-                final RectangularThicknessGrid rectangularGrid = new RectangularThicknessGrid(myType);
+                RectangularThicknessGrid rectangularGrid = new RectangularThicknessGrid(myType);
                 rectangularGrid.myTypeID = intDF.read(file);
                 rectangularGrid.myNumRow = intDF.read(file);
                 rectangularGrid.myNumCol = intDF.read(file);
@@ -58,13 +57,15 @@ public class GridDataFragment extends DataFragment<Grid> {
                 rectangularGrid.myCenterPos = new double[2];
                 rectangularGrid.myCenterPos[0] = doubleDF.read(file);
                 rectangularGrid.myCenterPos[1] = doubleDF.read(file);
-                final int numCells = rectangularGrid.myNumRow*rectangularGrid.myNumCol;
+                int numCells = rectangularGrid.myNumRow*rectangularGrid.myNumCol;
                 rectangularGrid.myCells = new Sector[numCells];
                 for(int cell = 0; cell < numCells; cell++) {
                     rectangularGrid.myCells[cell] = sectorDF.read(file);
                 }
                 return rectangularGrid;
         }
-        throw new RuntimeException("Tried to read grid, although grid was not available. This should not happen.");
+        throw new IOException("Tried to read grid, although grid was not available. This should not happen.");
     }
+
+
 }
