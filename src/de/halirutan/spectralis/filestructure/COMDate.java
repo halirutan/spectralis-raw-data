@@ -1,4 +1,4 @@
-package de.halirutan.spectralis.data;
+package de.halirutan.spectralis.filestructure;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

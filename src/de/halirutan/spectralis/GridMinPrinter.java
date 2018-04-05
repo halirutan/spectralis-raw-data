@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.halirutan.spectralis.data.CircularThicknessGrid;
-import de.halirutan.spectralis.data.Grid;
+import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
+import de.halirutan.spectralis.filestructure.Grid;
 import de.halirutan.spectralis.filestructure.HSFFile;
 
 /**

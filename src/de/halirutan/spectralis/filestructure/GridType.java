@@ -1,4 +1,4 @@
-package de.halirutan.spectralis.data;
+package de.halirutan.spectralis.filestructure;
 
 /**
  * Created by patrick on 14.02.18.
@@ -13,10 +13,10 @@ public enum GridType {
     RECTANGULAR_20(9, "Rectangular grid 20deg PMB with 2x10 cells"),
     RECTANGULAR_POLE(10, "Rectangular grid posterior pole with 8x8 cells");
 
-    private int myType;
-    private String myDescription;
+    private final int myType;
+    private final String myDescription;
 
-    GridType(int i, final String description) {
+    GridType(int i, String description) {
         myType = i;
         myDescription = description;
     }
@@ -32,19 +32,19 @@ public enum GridType {
     public static GridType getGridType(int typeId) {
         switch (typeId) {
             case 1:
-                return GridType.CIRCULAR1;
+                return CIRCULAR1;
             case 2:
-                return GridType.CIRCULAR2;
+                return CIRCULAR2;
             case 3:
-                return GridType.CIRCULAR_ETDRS;
+                return CIRCULAR_ETDRS;
             case 8:
-                return GridType.RECTANGULAR_15;
+                return RECTANGULAR_15;
             case 9:
-                return GridType.RECTANGULAR_20;
+                return RECTANGULAR_20;
             case 10:
-                return GridType.RECTANGULAR_POLE;
+                return RECTANGULAR_POLE;
             default:
-                return GridType.NO_GRID;
+                return NO_GRID;
         }
     }
 

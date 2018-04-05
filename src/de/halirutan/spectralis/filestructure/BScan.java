@@ -1,7 +1,6 @@
 package de.halirutan.spectralis.filestructure;
 
 import de.halirutan.spectralis.data.DataFragment;
-import de.halirutan.spectralis.data.DataTypes;
 import de.halirutan.spectralis.data.FloatArrayDataFragment;
 
 import java.io.IOException;

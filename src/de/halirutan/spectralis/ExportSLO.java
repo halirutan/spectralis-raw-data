@@ -1,12 +1,11 @@
 package de.halirutan.spectralis;
 
-import de.halirutan.spectralis.data.SLOImage;
+import de.halirutan.spectralis.filestructure.SLOImage;
 import de.halirutan.spectralis.filestructure.HSFFile;
 
 import javax.imageio.ImageIO;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

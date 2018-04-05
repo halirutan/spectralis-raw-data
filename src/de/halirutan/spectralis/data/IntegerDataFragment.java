@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
+import de.halirutan.spectralis.filestructure.DataTypes;
+
 /**
  * Created by patrick on 09.01.17.
  * (c) Patrick Scheibe 2017

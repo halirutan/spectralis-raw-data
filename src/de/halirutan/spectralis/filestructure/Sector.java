@@ -1,4 +1,6 @@
-package de.halirutan.spectralis.data;
+package de.halirutan.spectralis.filestructure;
+
+import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
 
 /**
  * Provides retinal thickness within one cell of a thickness grid

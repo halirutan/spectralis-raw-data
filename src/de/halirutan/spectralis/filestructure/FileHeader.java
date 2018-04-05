@@ -1,102 +1,259 @@
 package de.halirutan.spectralis.filestructure;
 
-import com.sun.istack.internal.Nullable;
-import de.halirutan.spectralis.data.DataFragment;
-import de.halirutan.spectralis.data.FloatDataFragment;
-import de.halirutan.spectralis.data.IntegerDataFragment;
-import de.halirutan.spectralis.data.StringDataFragment;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.EnumMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+
+import de.halirutan.spectralis.UnsupportedVersionException;
 
 /**
  * Created by patrick on 09.01.17.
  * (c) Patrick Scheibe 2017
  */
+@SuppressWarnings({"unused", "OverlyLongMethod", "ClassWithTooManyMethods", "ClassWithoutNoArgConstructor"})
 public class FileHeader {
 
-    private static final long VERSION_OFFSET = 0;
     private static final long HEADER_OFFSET = 0;
 
-    private final RandomAccessFile file;
-    private final HSFVersion myHSFVersion;
-    private final Map<FileHeaderContent, DataFragment> myInfo = new EnumMap<>(FileHeaderContent.class);
+    private static final int SCAN_POSITION_BYTE_COUNT = 4;
+    private static final int ID_BYTE_COUNT = 16;
+    private static final int REFERENCE_ID_BYTE_COUNT = 16;
+    private static final int PATIENT_ID_BYTE_COUNT = 21;
+    private static final int PADDING_ID_BYTE_COUNT = 3;
+    private static final int VISIT_ID_BYTE_COUNT = 24;
+    private static final int PROG_ID_BYTE_COUNT = 24;
 
-    FileHeader(RandomAccessFile inFile) throws IOException {
-        file = inFile;
-        file.seek(VERSION_OFFSET);
-        myHSFVersion = readVersion(file);
-        if (myHSFVersion == null) {
-            throw new IOException("Invalid file");
+
+    private final HSFVersion version;
+    private final int sizeX;
+    private final int numBScans;
+    private final int sizeZ;
+    private final double scaleX;
+    private final double distance;
+    private final double scaleZ;
+    private final int sizeXSlo;
+    private final int sizeYSlo;
+    private final double scaleXSlo;
+    private final double scaleYSlo;
+    private final int fieldSizeSlo;
+    private final double scanFocus;
+    private final String scanPosition;
+    private final LocalDateTime examTime;
+    private final int scanPattern;
+    private final int bScanHdrSize;
+    private final String id;
+    private final String referenceId;
+    private int pid;
+    private String patientId;
+    private LocalDateTime dob;
+    private int vid;
+    private String visitId;
+    private LocalDateTime visitDate;
+    private int gridType1;
+    private int gridOffset1;
+    private int gridType2;
+    private int gridOffset2;
+    private String progId;
+
+    FileHeader(RandomAccessFile file) throws IOException {
+        file.seek(HEADER_OFFSET);
+        version = HSFVersion.readVersion(file);
+        if (version == HSFVersion.INVALID) {
+            throw new IOException("Invalid vol file. Cannot parse version.");
         }
 
-        file.readInt();
+        sizeX = file.readInt();
+        numBScans = file.readInt();
+        sizeZ = file.readInt();
+        scaleX = file.readDouble();
+        distance = file.readDouble();
+        scaleZ = file.readDouble();
+        sizeXSlo = file.readInt();
+        sizeYSlo = file.readInt();
+        scaleXSlo = file.readDouble();
+        scaleYSlo = file.readDouble();
+        fieldSizeSlo = file.readInt();
+        scanFocus = file.readDouble();
+        scanPosition = Util.readString(file, SCAN_POSITION_BYTE_COUNT);
+        examTime = Util.readExamTime(file);
+        scanPattern = file.readInt();
+        bScanHdrSize = file.readInt();
+        id = Util.readStringTrimmed(file, ID_BYTE_COUNT);
+        referenceId = Util.readStringTrimmed(file, REFERENCE_ID_BYTE_COUNT);
 
-
-
-
-
-        for (FileHeaderContent content : FileHeaderContent.values()) {
-            if (myHSFVersion.compareTo(content.getVersion()) < 0) break;
-            myInfo.put(content, content.readData(this.file));
+        if (version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            pid = file.readInt();
+            patientId = Util.readStringTrimmed(file, PATIENT_ID_BYTE_COUNT);
+            file.skipBytes(PADDING_ID_BYTE_COUNT);
+            dob = Util.readDate(file);
+            vid = file.readInt();
+            visitId = Util.readStringTrimmed(file, VISIT_ID_BYTE_COUNT);
+            visitDate = Util.readDate(file);
         }
-        int test = FileHeaderContent.GridType.getDataFragment().read(this.file);
+
+        if (version.isAtLeast(HSFVersion.HSF_OCT_102)) {
+            gridType1 = file.readInt();
+            gridOffset1 = file.readInt();
+        }
+
+        if (version.isAtLeast(HSFVersion.HSF_OCT_103)) {
+            gridType2 = file.readInt();
+            gridOffset2 = file.readInt();
+            progId = Util.readStringTrimmed(file, PROG_ID_BYTE_COUNT);
+        }
+
     }
 
-
-    public DataFragment get(FileHeaderContent info) {
-        return myInfo.get(info);
-    }
-
-    public Integer getIntegerValue(FileHeaderContent content) {
-        if (content.getDataFragment() instanceof IntegerDataFragment) {
-            return (Integer) myInfo.get(content).getValue();
-        }
-        return null;
-    }
-
-    public Float getFloatValue(FileHeaderContent content) {
-        if (content.getDataFragment() instanceof FloatDataFragment) {
-            return (Float) myInfo.get(content).getValue();
-        }
-        return null;
-    }
-
-
-    private static HSFVersion readVersion(RandomAccessFile f) throws IOException {
-        long oldPosition = f.getFilePointer();
-        f.seek(0);
-        HSFVersion result = null;
-        StringDataFragment version = new StringDataFragment(12);
-        String versionString = version.read(f);
-        for (HSFVersion value : HSFVersion.values()) {
-            if (value.getVersionString().equals(versionString)) {
-                result = value;
-                break;
-            }
-        }
-        f.seek(oldPosition);
-        return result;
-    }
-
-    @Nullable
-    private static HSFVersion readVersion(File file) throws IOException {
-        HSFVersion version = null;
-        if (file.canRead()) {
-            RandomAccessFile f = new RandomAccessFile(file, "r");
-            version = readVersion(f);
-        }
+    public final HSFVersion getVersion() {
         return version;
     }
 
-    static boolean isValidHSFFile(File file) {
-        try {
-            return readVersion(file) != null;
-        } catch (IOException e) {
-            return false;
+    public final int getSizeX() {
+        return sizeX;
+    }
+
+    public final int getNumBScans() {
+        return numBScans;
+    }
+
+    public final int getSizeZ() {
+        return sizeZ;
+    }
+
+    public final double getScaleX() {
+        return scaleX;
+    }
+
+    public final double getDistance() {
+        return distance;
+    }
+
+    public final double getScaleZ() {
+        return scaleZ;
+    }
+
+    public final int getSizeXSlo() {
+        return sizeXSlo;
+    }
+
+    public final int getSizeYSlo() {
+        return sizeYSlo;
+    }
+
+    public final double getScaleXSlo() {
+        return scaleXSlo;
+    }
+
+    public final double getScaleYSlo() {
+        return scaleYSlo;
+    }
+
+    public final int getFieldSizeSlo() {
+        return fieldSizeSlo;
+    }
+
+    public final double getScanFocus() {
+        return scanFocus;
+    }
+
+    public final String getScanPosition() {
+        return scanPosition;
+    }
+
+    public final LocalDateTime getExamTime() {
+        return examTime;
+    }
+
+    public final int getScanPattern() {
+        return scanPattern;
+    }
+
+    public final int getBScanHdrSize() {
+        return bScanHdrSize;
+    }
+
+    public final String getId() {
+        return id;
+    }
+
+    public final String getReferenceId() {
+        return referenceId;
+    }
+
+    public final int getPid() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
         }
+        return pid;
+    }
+
+    public final String getPatientId() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
+        }
+        return patientId;
+    }
+
+    public final LocalDateTime getDob() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
+        }
+        return dob;
+    }
+
+    public final int getVid() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
+        }
+        return vid;
+    }
+
+    public final String getVisitId() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
+        }
+        return visitId;
+    }
+
+    public final LocalDateTime getVisitDate() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
+        }
+        return visitDate;
+    }
+
+    public final int getGridType1() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_102)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_102);
+        }
+        return gridType1;
+    }
+
+    public final int getGridOffset1() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_102)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_102);
+        }
+        return gridOffset1;
+    }
+
+    public final int getGridType2() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_103)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_103);
+        }
+        return gridType2;
+    }
+
+    public final int getGridOffset2() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_103)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_103);
+        }
+        return gridOffset2;
+    }
+
+    public final String getProgId() throws UnsupportedVersionException {
+        if (!version.isAtLeast(HSFVersion.HSF_OCT_103)) {
+            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_103);
+        }
+        return progId;
     }
 }

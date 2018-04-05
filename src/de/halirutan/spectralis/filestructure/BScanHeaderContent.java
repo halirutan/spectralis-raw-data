@@ -9,7 +9,7 @@ import java.io.RandomAccessFile;
  * Created by patrick on 11.01.17.
  * (c) Patrick Scheibe 2017
  */
-public enum  BScanHeaderContent implements HeaderContent{
+public enum  BScanHeaderContent{
     Version(new StringDataFragment(12)),
     BScanHdrSize(new IntegerDataFragment()),
     StartX(new DoubleDataFragment()),

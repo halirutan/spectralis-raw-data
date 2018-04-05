@@ -3,6 +3,8 @@ package de.halirutan.spectralis.data;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import de.halirutan.spectralis.filestructure.Sector;
+
 /**
  * Created by patrick on 14.02.18.
  * (c) Patrick Scheibe 2018

@@ -16,7 +16,7 @@ import de.halirutan.spectralis.data.StringDataFragment;
  * (c) Patrick Scheibe 2017
  */
 @SuppressWarnings({"FieldNamingConvention", "EnumClass"})
-public enum FileHeaderContent implements HeaderContent{
+public enum FileHeaderContent{
     Version(new StringDataFragment(12)),
     SizeX(new IntegerDataFragment()),
     NumBScans(new IntegerDataFragment()),

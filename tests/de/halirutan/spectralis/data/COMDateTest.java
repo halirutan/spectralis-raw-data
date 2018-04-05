@@ -1,5 +1,6 @@
 package de.halirutan.spectralis.data;
 
+import de.halirutan.spectralis.filestructure.COMDate;
 import org.junit.Test;
 
 import java.time.LocalDateTime;

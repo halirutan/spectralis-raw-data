@@ -1,4 +1,4 @@
-package de.halirutan.spectralis.data;
+package de.halirutan.spectralis.filestructure;
 
 /**
  * Created by patrick on 11.01.17.

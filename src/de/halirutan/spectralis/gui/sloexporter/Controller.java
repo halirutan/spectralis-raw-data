@@ -1,6 +1,6 @@
 package de.halirutan.spectralis.gui.sloexporter;
 
-import de.halirutan.spectralis.data.SLOImage;
+import de.halirutan.spectralis.filestructure.SLOImage;
 import de.halirutan.spectralis.filestructure.HSFFile;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

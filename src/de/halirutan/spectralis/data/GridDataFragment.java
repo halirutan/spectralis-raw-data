@@ -3,6 +3,12 @@ package de.halirutan.spectralis.data;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
+import de.halirutan.spectralis.filestructure.Grid;
+import de.halirutan.spectralis.filestructure.GridType;
+import de.halirutan.spectralis.filestructure.RectangularThicknessGrid;
+import de.halirutan.spectralis.filestructure.Sector;
+
 /**
  * Created by patrick on 14.02.18.
  * (c) Patrick Scheibe 2018

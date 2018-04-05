@@ -23,7 +23,7 @@ public class FileHeaderTest {
     @Test
     public final void readHeader() throws Exception {
         HSFFile hsfFile = new HSFFile(getVolFile(VALID));
-        FileHeader fileHeader = hsfFile.getFileHeader();
+        FileHeader fileHeader = hsfFile.getInfo();
         assertEquals(0, (int) fileHeader.getIntegerValue(FileHeaderContent.GridType));
         for (FileHeaderContent content : fileHeader.myInfo.keySet()) {
             System.out.println(content.name() + " = " + content.getDataFragment().getValue());

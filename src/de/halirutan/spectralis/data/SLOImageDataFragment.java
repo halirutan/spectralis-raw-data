@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
+import de.halirutan.spectralis.filestructure.SLOImage;
+
 /**
  * Created by patrick on 10.01.17.
  * (c) Patrick Scheibe 2017

@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import de.halirutan.spectralis.filestructure.DataTypes;
+
 /**
  * This is annoying. For the ExamTime the HSF specification uses a different date representation which is an
  * unsigned 64-bit integer that represents the numer of 100-nanosecond units since the beginning of

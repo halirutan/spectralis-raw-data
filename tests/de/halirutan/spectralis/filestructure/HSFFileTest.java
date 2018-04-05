@@ -15,7 +15,7 @@ public class HSFFileTest {
     public final void read() throws Exception {
         HSFFile hsfFile = new HSFFile(getVolFile(VALID));
         Assert.assertNotNull("HSF File is null", hsfFile);
-        Assert.assertNotNull("Header is null", hsfFile.getFileHeader());
+        Assert.assertNotNull("Header is null", hsfFile.getInfo());
     }
 
 
