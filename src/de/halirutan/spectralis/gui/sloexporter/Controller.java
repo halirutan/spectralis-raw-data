@@ -1,5 +1,6 @@
 package de.halirutan.spectralis.gui.sloexporter;
 
+import de.halirutan.spectralis.filestructure.HSFVersion;
 import de.halirutan.spectralis.filestructure.SLOImage;
 import de.halirutan.spectralis.filestructure.HSFFile;
 import javafx.collections.FXCollections;
@@ -51,7 +52,7 @@ public class Controller implements Initializable {
     }
 
     public void addFiles() {
-        final List<File> files = showFileSelectDialog();
+        List<File> files = showFileSelectDialog();
         if (files != null) {
             myFiles.addAll(files);
             listViewItems.addAll(files);
@@ -60,7 +61,7 @@ public class Controller implements Initializable {
     }
 
     public void addDirectory() {
-        final File dir = showDirectorySelectDialog();
+        File dir = showDirectorySelectDialog();
         if (dir != null) {
             myDirectories.add(dir);
             listViewItems.add(dir);
@@ -74,7 +75,7 @@ public class Controller implements Initializable {
     }
 
     public void exportFiles() {
-        final File outputDir = showDirectorySelectDialog("Select output directory");
+        File outputDir = showDirectorySelectDialog("Select output directory");
         if (!outputDir.canWrite()) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot write to output directory");
             alert.show();
@@ -94,7 +95,7 @@ public class Controller implements Initializable {
 
 
     private List<File> showFileSelectDialog() {
-        final Window window = root.getScene().getWindow();
+        Window window = root.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select .vol files or directories");
         fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Raw Volume files", "vol"));
@@ -102,7 +103,7 @@ public class Controller implements Initializable {
     }
 
     private File showDirectorySelectDialog(String title) {
-        final Window window = root.getScene().getWindow();
+        Window window = root.getScene().getWindow();
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setTitle(title);
         return dirChooser.showDialog(window);
@@ -124,7 +125,7 @@ public class Controller implements Initializable {
 
         @Override
         protected void succeeded() {
-            final Integer value = getValue();
+            Integer value = getValue();
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             String text;
             switch (value) {
@@ -167,11 +168,11 @@ public class Controller implements Initializable {
             List<File> myRealVolFiles = new ArrayList<>(myFiles.size());
             if (myDirectories.size() > 0) {
                 for (File directory : myDirectories) {
-                    final boolean recursively = checkDiveInto.isSelected();
-                    final Collection<File> files = FileUtils.listFiles(directory, new String[]{"vol"}, recursively);
+                    boolean recursively = checkDiveInto.isSelected();
+                    Collection<File> files = FileUtils.listFiles(directory, new String[]{"vol"}, recursively);
                     updateMessage("Checking directory " + FilenameUtils.getBaseName(directory.getName()));
                     for (File next : files) {
-                        if (HSFFile.isValidHSFFile(next)) {
+                        if (HSFVersion.readVersion(next) != HSFVersion.INVALID) {
                             myRealVolFiles.add(next);
                             updateMessage("Adding " + FilenameUtils.getBaseName(next.getName()) + " for export");
                         }
@@ -181,8 +182,8 @@ public class Controller implements Initializable {
             }
 
             for (File file : myFiles) {
-                final String baseName = FilenameUtils.getBaseName(file.getName());
-                if (HSFFile.isValidHSFFile(file)) {
+                String baseName = FilenameUtils.getBaseName(file.getName());
+                if (HSFVersion.readVersion(file) != HSFVersion.INVALID) {
                     myRealVolFiles.add(file);
                     updateMessage("Adding " + baseName + " for export");
                 } else {
@@ -192,12 +193,12 @@ public class Controller implements Initializable {
             }
 
             for (File volFile : myRealVolFiles) {
-                final HSFFile hsfFile = new HSFFile(volFile);
+                HSFFile hsfFile = new HSFFile(volFile);
                 SLOImage img = hsfFile.getSLOImage();
-                final String baseName = FilenameUtils.getBaseName(volFile.getName());
+                String baseName = FilenameUtils.getBaseName(volFile.getName());
                 updateMessage("Exporting SLO from " + baseName);
                 if (img != null) {
-                    final String outName = FilenameUtils.concat(outputDirectory.getAbsolutePath(), baseName + ".png");
+                    String outName = FilenameUtils.concat(outputDirectory.getAbsolutePath(), baseName + ".png");
                     try {
                         File outFile = new File(outName);
                         if (!outFile.canWrite()) {

@@ -20,21 +20,20 @@ public class Util {
     private static final LocalDateTime ZERO_COM_TIME = LocalDateTime.of(1899, 12, 30, 0, 0);
     private static final BigDecimal MILLIS_PER_DAY = new BigDecimal(86400000);
 
-
     private Util() {
     }
 
-    public static String readString(RandomAccessFile file, int size) throws IOException {
+    static String readString(RandomAccessFile file, int size) throws IOException {
         byte result[] = new byte[size];
         file.read(result, 0, size);
         return new String(result, Charset.forName(CHARSET));
     }
 
-    public static String readStringTrimmed(RandomAccessFile file, int size) throws IOException {
+    static String readStringTrimmed(RandomAccessFile file, int size) throws IOException {
         return readString(file, size).trim();
     }
 
-    public static float[] readFloatArray(DataInput file, int size) throws IOException {
+    static float[] readFloatArray(DataInput file, int size) throws IOException {
         float [] result = new float[size];
         for (int i = 0; i < size; i++) {
             result[i] = file.readFloat();
@@ -42,7 +41,7 @@ public class Util {
         return result;
     }
 
-    public static double[] readDoubleArray(DataInput file, int size) throws IOException {
+    static double[] readDoubleArray(DataInput file, int size) throws IOException {
         double [] result = new double[size];
         for (int i = 0; i < size; i++) {
             result[i] = file.readDouble();
@@ -50,7 +49,7 @@ public class Util {
         return result;
     }
 
-    public static int[] readIntArray(DataInput file, int size) throws IOException {
+    static int[] readIntArray(DataInput file, int size) throws IOException {
         int [] result = new int[size];
         for (int i = 0; i < size; i++) {
             result[i] = file.readInt();
@@ -58,18 +57,18 @@ public class Util {
         return result;
     }
 
-    public static LocalDateTime readExamTime(RandomAccessFile file) throws IOException {
+    static LocalDateTime readExamTime(RandomAccessFile file) throws IOException {
         ByteBuffer buffer = readIntoBuffer(file, DataTypes.ExamTime);
         long seconds = buffer.getLong() / DATE_SCALE;
         return START_TIME.plus(seconds, ChronoUnit.SECONDS);
     }
 
-    public static LocalDateTime readDate(RandomAccessFile file) throws IOException {
+    static LocalDateTime readDate(RandomAccessFile file) throws IOException {
         ByteBuffer buffer = readIntoBuffer(file, DataTypes.Date);
         return toLocalDateTime(buffer.getDouble());
     }
 
-    public static Sector readSector(RandomAccessFile file) throws IOException {
+    static Sector readSector(DataInput file) throws IOException {
         float thickness = file.readFloat();
         float volume = file.readFloat();
         return new Sector(thickness, volume);
@@ -83,7 +82,7 @@ public class Util {
      * @return The bytes read, wrapped into a {@link ByteBuffer}
      * @throws IOException if something went wrong during reading
      */
-    public static ByteBuffer readIntoBuffer(RandomAccessFile file, int size) throws IOException {
+    static ByteBuffer readIntoBuffer(RandomAccessFile file, int size) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.order(BYTE_ORDER);
         file.read(buffer.array(), 0, size);
@@ -91,7 +90,7 @@ public class Util {
     }
 
 
-    private static LocalDateTime toLocalDateTime(double d) {
+    public static LocalDateTime toLocalDateTime(double d) {
         return toLocalDateTime(BigDecimal.valueOf(d));
     }
 

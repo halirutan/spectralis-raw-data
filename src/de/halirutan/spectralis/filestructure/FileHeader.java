@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import de.halirutan.spectralis.UnsupportedVersionException;
 
 /**
+ * //TODO: use ByteBuffer instead of reading directly from the file. The default endianess is wrong
  * Created by patrick on 09.01.17.
  * (c) Patrick Scheibe 2017
  */

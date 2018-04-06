@@ -1,5 +1,6 @@
 package de.halirutan.spectralis;
 
+import de.halirutan.spectralis.filestructure.HSFVersion;
 import de.halirutan.spectralis.filestructure.SLOImage;
 import de.halirutan.spectralis.filestructure.HSFFile;
 
@@ -24,7 +25,7 @@ public class ExportSLO {
         }
 
         File file = new File(args[0]);
-        if (file.exists() && file.canRead() && HSFFile.isValidHSFFile(file)) {
+        if (file.exists() && file.canRead() && (HSFVersion.readVersion(file) != HSFVersion.INVALID)) {
             try {
                 HSFFile hsfFile = new HSFFile(file);
                 SLOImage slo = hsfFile.getSLOImage();
@@ -32,7 +33,7 @@ public class ExportSLO {
                 ImageIO.write(slo.getImage(), "png", output);
                 LOG.log(Level.INFO, "File saved");
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Could not write file");
+                LOG.log(Level.WARNING, "Could not write file", e);
             }
         }
     }

@@ -6,11 +6,9 @@ import com.wolfram.jlink.KernelLink;
 import com.wolfram.jlink.StdLink;
 import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
+import de.halirutan.spectralis.filestructure.FileHeader;
 import de.halirutan.spectralis.filestructure.Grid;
 import de.halirutan.spectralis.filestructure.GridType;
-import de.halirutan.spectralis.data.StringDataFragment;
-import de.halirutan.spectralis.filestructure.FileHeader;
-import de.halirutan.spectralis.filestructure.FileHeaderContent;
 import de.halirutan.spectralis.filestructure.HSFFile;
 
 /**
@@ -28,9 +26,8 @@ public class MathematicaInterface {
             if ((grid != null) && (link != null)) {
                 if (grid.getGridType() == GridType.CIRCULAR_ETDRS) {
                         FileHeader fileHeader = hsfFile.getInfo();
-                        StringDataFragment stringDataFragment = (StringDataFragment) fileHeader.get(FileHeaderContent.ScanPosition);
                         CircularThicknessGrid g = (CircularThicknessGrid) grid;
-                        return "OD".equals(stringDataFragment.getValue()) ? g.getMinCentralThickness() : -g.getMinCentralThickness();
+                        return "OD".equals(fileHeader.getScanPosition()) ? g.getMinCentralThickness() : -g.getMinCentralThickness();
                 }
             }
         } catch (SpectralisException e) {

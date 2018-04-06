@@ -10,16 +10,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.halirutan.spectralis.SpectralisException;
-import de.halirutan.spectralis.data.SLOImageDataFragment;
 
 /**
  * Created by patrick on 10.01.17.
  * (c) Patrick Scheibe 2017
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
 public class HSFFile {
 
-    @SuppressWarnings("FieldCanBeLocal")
     private static final int SLO_FILE_OFFSET = 2048;
     private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.filestructure.HSFFile");
     private final RandomAccessFile file;
@@ -107,7 +104,7 @@ public class HSFFile {
      * @return List of BScans
      * @throws SpectralisException Error during reading
      */
-    public final List<BScan> getBScans() throws SpectralisException {
+    public final List<BScanData> getBScans() throws SpectralisException {
         return getBScans(0, info.getNumBScans());
     }
 
@@ -118,38 +115,43 @@ public class HSFFile {
      * @return BScan
      * @throws SpectralisException Error during reading
      */
-    public final BScan getBScan(int i) throws SpectralisException {
-        List<BScan> bScans = getBScans(i, 1);
+    public final BScanData getBScan(int i) throws SpectralisException {
+        List<BScanData> bScans = getBScans(i, 1);
         return bScans.get(0);
     }
 
-    private List<BScan> getBScans(int start, int count) throws SpectralisException {
-        try {
-            int sloWidth = info.getSizeXSlo();
-            int sloHeight = info.getSizeYSlo();
-            int sizeX = getSizeX();
-            Integer sizeZ = getSizeZ();
-            Integer bScanHdrSize = getBScanHdrSize();
-            Integer numBScans = getNumBScans();
-            if ((start + count) > numBScans) {
-                throw new SpectralisException("Not enough available BScans in dataset");
-            }
-
-            List<BScan> bScans = new ArrayList<>(count);
-
-            long offsetBScan = SLO_FILE_OFFSET + (sloWidth * sloHeight);
-            for (int i = start; i < (start + count); i++) {
-                file.seek(offsetBScan + (i * (bScanHdrSize + (sizeX * sizeZ * DataTypes.Float))));
-                bScans.add(BScan.read(file, info));
-            }
-            return bScans;
-        } catch (IOException e) {
-            throw new SpectralisException(e);
+    private List<BScanData> getBScans(int start, int count) throws SpectralisException {
+        int bScanHdrSize = info.getBScanHdrSize();
+        int sizeX = info.getSizeX();
+        int sizeZ = info.getSizeZ();
+        int numBScans = info.getNumBScans();
+        if ((start + count) > numBScans) {
+            throw new SpectralisException("Not enough available BScans in dataset");
         }
+
+        List<BScanData> bScans = new ArrayList<>(count);
+        int bsBlkSize = bScanHdrSize + (sizeX * sizeZ * DataTypes.Float);
+        for (int i = start; i < (start + count); i++) {
+            int offset = bScanOffset + (i * bsBlkSize);
+            BScanData bs = new BScanData(file, offset, sizeX, sizeZ);
+            bScans.add(bs);
+        }
+        return bScans;
     }
 
     public final FileHeader getInfo() {
         return info;
     }
 
+    public final HSFVersion getVersion() {
+        return version;
+    }
+
+    public final void close() {
+        try {
+            file.close();
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, "Error closing file");
+        }
+    }
 }

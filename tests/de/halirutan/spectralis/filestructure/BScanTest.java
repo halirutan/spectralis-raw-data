@@ -1,11 +1,5 @@
 package de.halirutan.spectralis.filestructure;
 
-import de.halirutan.spectralis.Util;
-import de.halirutan.spectralis.data.DataFragment;
-import org.junit.Test;
-
-import java.io.RandomAccessFile;
-
 /**
  * Created by patrick on 11.01.17.
  * (c) Patrick Scheibe 2017

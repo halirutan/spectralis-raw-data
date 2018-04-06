@@ -10,23 +10,23 @@ import java.awt.image.Raster;
  */
 public class SLOImage  {
 
-    private final byte[] pixels;
+    private final byte[] pixelData;
     private final int myWidth;
     private final int myHeight;
 
-    public SLOImage(int width, int height, byte[] pixels) {
+    SLOImage(int width, int height, byte[] pixels) {
         myWidth = width;
         myHeight = height;
-        this.pixels = pixels;
+        pixelData = pixels;
     }
 
-    public byte[] getPixels() {
-        return pixels;
+    public final byte[] getPixelData() {
+        return pixelData;
     }
 
-    public BufferedImage getImage() {
+    public final BufferedImage getImage() {
         BufferedImage img = new BufferedImage(myWidth, myHeight, BufferedImage.TYPE_BYTE_GRAY);
-        img.setData(Raster.createRaster(img.getSampleModel(), new DataBufferByte(pixels, pixels.length), null));
+        img.setData(Raster.createRaster(img.getSampleModel(), new DataBufferByte(pixelData, pixelData.length), null));
         return img;
     }
 }

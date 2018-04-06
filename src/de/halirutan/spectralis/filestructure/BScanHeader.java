@@ -11,7 +11,7 @@ public class BScanHeader {
     private final int offset;
     private static final int VERSION_BYTE_SIZE = 12;
     private static final int NUM_TRANSFORM_ENTRIES = 6;
-    private final HSFVersion version;
+    private final BScanVersion version;
 
     private final int bScanHdrSize;
     private final double startX;
@@ -33,8 +33,8 @@ public class BScanHeader {
         try {
             file.seek(offset);
             String versionString = Util.readStringTrimmed(file, VERSION_BYTE_SIZE);
-            version = HSFVersion.parseVersionString(versionString);
-            if (version == HSFVersion.INVALID) {
+            version = BScanVersion.parseVersionString(versionString);
+            if (version == BScanVersion.INVALID) {
                 throw new SpectralisException("Cannot read BScan Header");
             }
             bScanHdrSize = file.readInt();
@@ -45,30 +45,37 @@ public class BScanHeader {
             numSeg = file.readInt();
             offsetSeg = file.readInt();
 
-            if (version.isAtLeast(HSFVersion.HSF_OCT_101)) {
+            if (version.isAtLeast(BScanVersion.HSF_BS_101)) {
                 quality = file.readFloat();
             }
 
-            if (version.isAtLeast(HSFVersion.HSF_OCT_102)) {
+            if (version.isAtLeast(BScanVersion.HSF_BS_102)) {
                 shift = file.readInt();
             }
 
-            if (version.isAtLeast(HSFVersion.HSF_OCT_103)) {
+            if (version.isAtLeast(BScanVersion.HSF_BS_103)) {
                 transformation = Util.readFloatArray(file, NUM_TRANSFORM_ENTRIES);
             }
 
-            if (version.isAtLeast(HSFVersion.HSF_OCT_104)) {
+            if (version.isAtLeast(BScanVersion.HSF_BS_104)) {
                 bmoCoordLeft = Util.readIntArray(file, 3);
                 bmoCoordRight = Util.readIntArray(file, 3);
             }
-
         } catch (IOException e) {
             throw new SpectralisException(e);
         }
     }
 
-    public final HSFVersion getVersion() {
+    public final RandomAccessFile getFile() {
+        return file;
+    }
+
+    public final BScanVersion getVersion() {
         return version;
+    }
+
+    public final int getOffset() {
+        return offset;
     }
 
     public final int getbScanHdrSize() {
@@ -100,39 +107,37 @@ public class BScanHeader {
     }
 
     public final float getQuality() throws UnsupportedVersionException {
-        if (!version.isAtLeast(HSFVersion.HSF_OCT_101)) {
-            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_101);
+        if (!version.isAtLeast(BScanVersion.HSF_BS_101)) {
+            throw new UnsupportedVersionException(BScanVersion.HSF_BS_101);
         }
         return quality;
     }
 
     public final int getShift() throws UnsupportedVersionException {
-        if (!version.isAtLeast(HSFVersion.HSF_OCT_102)) {
-            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_102);
+        if (!version.isAtLeast(BScanVersion.HSF_BS_102)) {
+            throw new UnsupportedVersionException(BScanVersion.HSF_BS_102);
         }
         return shift;
     }
 
     public final float[] getTransformation() throws UnsupportedVersionException {
-        if (!version.isAtLeast(HSFVersion.HSF_OCT_103)) {
-            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_103);
+        if (!version.isAtLeast(BScanVersion.HSF_BS_103)) {
+            throw new UnsupportedVersionException(BScanVersion.HSF_BS_103);
         }
         return transformation;
     }
 
     public final int[] getBmoCoordLeft() throws UnsupportedVersionException {
-        if (!version.isAtLeast(HSFVersion.HSF_OCT_104)) {
-            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_104);
+        if (!version.isAtLeast(BScanVersion.HSF_BS_104)) {
+            throw new UnsupportedVersionException(BScanVersion.HSF_BS_104);
         }
         return bmoCoordLeft;
     }
 
     public final int[] getBmoCoordRight() throws UnsupportedVersionException {
-        if (!version.isAtLeast(HSFVersion.HSF_OCT_104)) {
-            throw new UnsupportedVersionException(HSFVersion.HSF_OCT_104);
+        if (!version.isAtLeast(BScanVersion.HSF_BS_104)) {
+            throw new UnsupportedVersionException(BScanVersion.HSF_BS_104);
         }
         return bmoCoordRight;
     }
-
-
 }

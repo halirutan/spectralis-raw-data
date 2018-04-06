@@ -1,28 +1,35 @@
 package de.halirutan.spectralis.filestructure;
 
-public enum SegmentationLayers {
-    ILM(0),
-    RPE(1),
-    NFL(2),
-    GCL(3),
-    IPL(4),
-    INL(5),
-    OPL(6),
-    ONL(7),
-    ELM(8),
-    IOS(9),
-    OPT(10),
-    CHO(11),
-    VIT(12),
-    ANT(13);
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.EnumMap;
+import java.util.Map;
 
-    private int layerNum;
+import de.halirutan.spectralis.SpectralisException;
 
-    SegmentationLayers(int num) {
-        layerNum = num;
+public class SegmentationLayers {
+
+    private final Map<LayerNames, RetinalLayer> layers;
+
+    SegmentationLayers(FileHeader fileHdr, BScanHeader info) throws SpectralisException {
+        RandomAccessFile file = info.getFile();
+        int offset = info.getOffset() + info.getOffsetSeg();
+        int num = info.getNumSeg();
+        int sizeX = fileHdr.getSizeX();
+        layers = new EnumMap<>(LayerNames.class);
+        LayerNames[] layerNames = LayerNames.values();
+        for (int i = 0; i < num; i++) {
+            RetinalLayer retinalLayer = null;
+            try {
+                retinalLayer = new RetinalLayer(file, offset + (i * sizeX), sizeX, layerNames[i]);
+            } catch (IOException e) {
+                throw new SpectralisException(e);
+            }
+            layers.put(layerNames[i], retinalLayer);
+        }
     }
 
-    public int getLayerNum() {
-        return layerNum;
+    public final Map<LayerNames, RetinalLayer> getLayers() {
+        return layers;
     }
 }
