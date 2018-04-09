@@ -2,6 +2,7 @@ package de.halirutan.spectralis.filestructure;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 
 import de.halirutan.spectralis.UnsupportedVersionException;
@@ -14,7 +15,8 @@ import de.halirutan.spectralis.UnsupportedVersionException;
 @SuppressWarnings({"unused", "OverlyLongMethod", "ClassWithTooManyMethods", "ClassWithoutNoArgConstructor"})
 public class FileHeader {
 
-    private static final long HEADER_OFFSET = 0;
+    private static final int HEADER_OFFSET = 0;
+    private static final int HEADER_SIZE = 2048;
 
     private static final int SCAN_POSITION_BYTE_COUNT = 4;
     private static final int ID_BYTE_COUNT = 16;
@@ -57,52 +59,53 @@ public class FileHeader {
     private String progId;
 
     FileHeader(RandomAccessFile file) throws IOException {
-        file.seek(HEADER_OFFSET);
-        version = HSFVersion.readVersion(file);
+        ByteBuffer buffer = Util.readIntoBuffer(file, HEADER_OFFSET, HEADER_SIZE);
+
+        version = HSFVersion.parseVersionString(Util.getStringTrimmed(buffer, 12));
         if (version == HSFVersion.INVALID) {
             throw new IOException("Invalid vol file. Cannot parse version.");
         }
 
-        sizeX = file.readInt();
-        numBScans = file.readInt();
-        sizeZ = file.readInt();
-        scaleX = file.readDouble();
-        distance = file.readDouble();
-        scaleZ = file.readDouble();
-        sizeXSlo = file.readInt();
-        sizeYSlo = file.readInt();
-        scaleXSlo = file.readDouble();
-        scaleYSlo = file.readDouble();
-        fieldSizeSlo = file.readInt();
-        scanFocus = file.readDouble();
-        scanPosition = Util.readString(file, SCAN_POSITION_BYTE_COUNT);
-        examTime = Util.readExamTime(file);
-        scanPattern = file.readInt();
-        bScanHdrSize = file.readInt();
-        id = Util.readStringTrimmed(file, ID_BYTE_COUNT);
-        referenceId = Util.readStringTrimmed(file, REFERENCE_ID_BYTE_COUNT);
+        sizeX = buffer.getInt();
+        numBScans = buffer.getInt();
+        sizeZ = buffer.getInt();
+        scaleX = buffer.getDouble();
+        distance = buffer.getDouble();
+        scaleZ = buffer.getDouble();
+        sizeXSlo = buffer.getInt();
+        sizeYSlo = buffer.getInt();
+        scaleXSlo = buffer.getDouble();
+        scaleYSlo = buffer.getDouble();
+        fieldSizeSlo = buffer.getInt();
+        scanFocus = buffer.getDouble();
+        scanPosition = Util.getString(buffer, SCAN_POSITION_BYTE_COUNT);
+        examTime = Util.readExamTime(buffer);
+        scanPattern = buffer.getInt();
+        bScanHdrSize = buffer.getInt();
+        id = Util.getStringTrimmed(buffer, ID_BYTE_COUNT);
+        referenceId = Util.getStringTrimmed(buffer, REFERENCE_ID_BYTE_COUNT);
 
         if (version.isAtLeast(HSFVersion.HSF_OCT_101)) {
-            pid = file.readInt();
-            patientId = Util.readStringTrimmed(file, PATIENT_ID_BYTE_COUNT);
-            file.skipBytes(PADDING_ID_BYTE_COUNT);
-            dob = Util.readDate(file);
-            vid = file.readInt();
-            visitId = Util.readStringTrimmed(file, VISIT_ID_BYTE_COUNT);
-            visitDate = Util.readDate(file);
+            pid = buffer.getInt();
+            patientId = Util.getStringTrimmed(buffer, PATIENT_ID_BYTE_COUNT);
+            int skip = buffer.position() + PADDING_ID_BYTE_COUNT;
+            buffer.position(skip);
+            dob = Util.readDate(buffer);
+            vid = buffer.getInt();
+            visitId = Util.getStringTrimmed(buffer, VISIT_ID_BYTE_COUNT);
+            visitDate = Util.readDate(buffer);
         }
 
         if (version.isAtLeast(HSFVersion.HSF_OCT_102)) {
-            gridType1 = file.readInt();
-            gridOffset1 = file.readInt();
+            gridType1 = buffer.getInt();
+            gridOffset1 = buffer.getInt();
         }
 
         if (version.isAtLeast(HSFVersion.HSF_OCT_103)) {
-            gridType2 = file.readInt();
-            gridOffset2 = file.readInt();
-            progId = Util.readStringTrimmed(file, PROG_ID_BYTE_COUNT);
+            gridType2 = buffer.getInt();
+            gridOffset2 = buffer.getInt();
+            progId = Util.getStringTrimmed(buffer, PROG_ID_BYTE_COUNT);
         }
-
     }
 
     public final HSFVersion getVersion() {

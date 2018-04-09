@@ -47,14 +47,26 @@ public class HSFFile {
         try {
             int sloWidth = info.getSizeXSlo();
             int sloHeight = info.getSizeYSlo();
-            file.seek(SLO_FILE_OFFSET);
-            ByteBuffer buffer = Util.readIntoBuffer(file, sloWidth * sloHeight);
+            ByteBuffer buffer = Util.readIntoBuffer(file, SLO_FILE_OFFSET,sloWidth * sloHeight);
             sloImage = new SLOImage(sloWidth, sloHeight, buffer.array());
         } catch (IOException e) {
             LOG.log(Level.WARNING, "Error reading the SLO image", e);
             throw new SpectralisException(e);
         }
         return sloImage;
+    }
+
+    public final List<BScanHeader> getBScanHeaders(int start, int count) throws SpectralisException {
+        if ((start < 0) || (count < 1) || ((start + count) > info.getNumBScans())) {
+            LOG.log(Level.WARNING, "Cannot access " + count + " BScans starting from " + start);
+            throw new SpectralisException("BScan index out of bounds.");
+        }
+        int bsBlkSize = info.getBScanHdrSize() + (info.getSizeX() * info.getSizeZ() * DataTypes.Float);
+        for (int i = start; i < (start + count); i++) {
+            // TODO: implement
+        }
+
+
     }
 
     /**
@@ -104,8 +116,8 @@ public class HSFFile {
      * @return List of BScans
      * @throws SpectralisException Error during reading
      */
-    public final List<BScanData> getBScans() throws SpectralisException {
-        return getBScans(0, info.getNumBScans());
+    public final List<BScanData> getBScanData() throws SpectralisException {
+        return getBScanData(0, info.getNumBScans());
     }
 
     /**
@@ -115,17 +127,17 @@ public class HSFFile {
      * @return BScan
      * @throws SpectralisException Error during reading
      */
-    public final BScanData getBScan(int i) throws SpectralisException {
-        List<BScanData> bScans = getBScans(i, 1);
+    public final BScanData getBScanData(int i) throws SpectralisException {
+        List<BScanData> bScans = getBScanData(i, 1);
         return bScans.get(0);
     }
 
-    private List<BScanData> getBScans(int start, int count) throws SpectralisException {
+    private List<BScanData> getBScanData(int start, int count) throws SpectralisException {
         int bScanHdrSize = info.getBScanHdrSize();
         int sizeX = info.getSizeX();
         int sizeZ = info.getSizeZ();
         int numBScans = info.getNumBScans();
-        if ((start + count) > numBScans) {
+        if ((start < 0) || ((start + count) > numBScans)) {
             throw new SpectralisException("Not enough available BScans in dataset");
         }
 

@@ -2,6 +2,7 @@ package de.halirutan.spectralis.filestructure;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 import de.halirutan.spectralis.SpectralisException;
 
@@ -14,6 +15,8 @@ import de.halirutan.spectralis.SpectralisException;
 @SuppressWarnings("MethodWithMultipleLoops")
 public class CircularThicknessGrid implements Grid {
 
+    private static final int GRID_BYTE_SIZE = 132;
+    private static final int NUM_SECTORS = 9;
     private final GridType type;
     private final int typeId;
     private final double diameters[];
@@ -32,17 +35,17 @@ public class CircularThicknessGrid implements Grid {
         }
 
         try {
-            file.seek(gridOffset);
-            typeId = file.readInt();
-            diameters = Util.readDoubleArray(file, 3);
-            centerPos = Util.readDoubleArray(file, 2);
-            centralThickness = file.readFloat();
-            minCentralThickness = file.readFloat();
-            maxCentralThickness = file.readFloat();
-            totalVolume = file.readFloat();
-            sectors = new Sector[9];
-            for (int i = 0; i < 9; i++) {
-                sectors[i] = Util.readSector(file);
+            ByteBuffer buffer = Util.readIntoBuffer(file, gridOffset, GRID_BYTE_SIZE);
+            typeId = buffer.getInt();
+            diameters = Util.getDoubleArray(buffer, 3);
+            centerPos = Util.getDoubleArray(buffer, 2);
+            centralThickness = buffer.getFloat();
+            minCentralThickness = buffer.getFloat();
+            maxCentralThickness = buffer.getFloat();
+            totalVolume = buffer.getFloat();
+            sectors = new Sector[NUM_SECTORS];
+            for (int i = 0; i < NUM_SECTORS; i++) {
+                sectors[i] = Util.readSector(buffer);
             }
 
         } catch (IOException e) {

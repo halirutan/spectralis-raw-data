@@ -2,6 +2,7 @@ package de.halirutan.spectralis.filestructure;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.UnsupportedVersionException;
@@ -9,6 +10,7 @@ import de.halirutan.spectralis.UnsupportedVersionException;
 public class BScanHeader {
     private final RandomAccessFile file;
     private final int offset;
+    private final int size;
     private static final int VERSION_BYTE_SIZE = 12;
     private static final int NUM_TRANSFORM_ENTRIES = 6;
     private final BScanVersion version;
@@ -27,39 +29,42 @@ public class BScanHeader {
     private int[] bmoCoordRight;
 
 
-    public BScanHeader(RandomAccessFile inputFile, int headerOffset) throws SpectralisException {
+    public BScanHeader(RandomAccessFile inputFile, int headerOffset, int headerSize) throws SpectralisException {
         file = inputFile;
+        size = headerSize;
         offset = headerOffset;
+
         try {
-            file.seek(offset);
-            String versionString = Util.readStringTrimmed(file, VERSION_BYTE_SIZE);
+            ByteBuffer buffer = Util.readIntoBuffer(file, offset, size);
+
+            String versionString = Util.getStringTrimmed(buffer, VERSION_BYTE_SIZE);
             version = BScanVersion.parseVersionString(versionString);
             if (version == BScanVersion.INVALID) {
                 throw new SpectralisException("Cannot read BScan Header");
             }
-            bScanHdrSize = file.readInt();
-            startX = file.readDouble();
-            startY = file.readDouble();
-            endX = file.readDouble();
-            endY = file.readDouble();
-            numSeg = file.readInt();
-            offsetSeg = file.readInt();
+            bScanHdrSize = buffer.getInt();
+            startX = buffer.getDouble();
+            startY = buffer.getDouble();
+            endX = buffer.getDouble();
+            endY = buffer.getDouble();
+            numSeg = buffer.getInt();
+            offsetSeg = buffer.getInt();
 
             if (version.isAtLeast(BScanVersion.HSF_BS_101)) {
-                quality = file.readFloat();
+                quality = buffer.getFloat();
             }
 
             if (version.isAtLeast(BScanVersion.HSF_BS_102)) {
-                shift = file.readInt();
+                shift = buffer.getInt();
             }
 
             if (version.isAtLeast(BScanVersion.HSF_BS_103)) {
-                transformation = Util.readFloatArray(file, NUM_TRANSFORM_ENTRIES);
+                transformation = Util.getFloatArray(buffer, NUM_TRANSFORM_ENTRIES);
             }
 
             if (version.isAtLeast(BScanVersion.HSF_BS_104)) {
-                bmoCoordLeft = Util.readIntArray(file, 3);
-                bmoCoordRight = Util.readIntArray(file, 3);
+                bmoCoordLeft = Util.getIntArray(buffer, 3);
+                bmoCoordRight = Util.getIntArray(buffer, 3);
             }
         } catch (IOException e) {
             throw new SpectralisException(e);

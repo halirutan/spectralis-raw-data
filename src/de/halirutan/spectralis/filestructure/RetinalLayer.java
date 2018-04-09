@@ -2,6 +2,8 @@ package de.halirutan.spectralis.filestructure;
 
 import java.io.DataInput;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 /**
  * Created by patrick on 06.04.18.
@@ -13,10 +15,11 @@ public class RetinalLayer {
     private final LayerNames name;
     private final int size;
 
-    RetinalLayer(DataInput file, int layerOffset, int layerSize, LayerNames layerName) throws IOException {
+    RetinalLayer(RandomAccessFile file, int layerOffset, int layerSize, LayerNames layerName) throws IOException {
         name = layerName;
         size = layerSize;
-        layer = Util.readFloatArray(file, size);
+        ByteBuffer buffer = Util.readIntoBuffer(file, layerOffset, layerSize * DataTypes.Float);
+        layer = Util.getFloatArray(buffer, size);
     }
 
     public final float[] getLayer() {

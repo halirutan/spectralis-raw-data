@@ -2,6 +2,7 @@ package de.halirutan.spectralis.filestructure;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
 
 import de.halirutan.spectralis.SpectralisException;
 
@@ -12,6 +13,8 @@ import de.halirutan.spectralis.SpectralisException;
  * (c) Patrick Scheibe 2018
  */
 public class RectangularThicknessGrid implements Grid {
+
+    private final int INFO_BYTE_SIZE = 40;
 
     private final GridType type;
     private final int typeID;
@@ -31,18 +34,19 @@ public class RectangularThicknessGrid implements Grid {
         }
 
         try {
-            file.seek(gridOffset);
-            typeID = file.readInt();
-            numRow = file.readInt();
-            numCol = file.readInt();
-            cellWidth = file.readFloat();
-            cellHeight = file.readFloat();
-            tilt = file.readFloat();
-            centerPos = Util.readDoubleArray(file, 2);
+            ByteBuffer buffer = Util.readIntoBuffer(file, gridOffset, INFO_BYTE_SIZE);
+            typeID = buffer.getInt();
+            numRow = buffer.getInt();
+            numCol = buffer.getInt();
+            cellWidth = buffer.getFloat();
+            cellHeight = buffer.getFloat();
+            tilt = buffer.getFloat();
+            centerPos = Util.getDoubleArray(buffer, 2);
             int numCells = numCol * numRow;
+            ByteBuffer dataBuffer = Util.readIntoBuffer(file, gridOffset + INFO_BYTE_SIZE, numCells * DataTypes.Float * 2);
             sectors = new Sector[numCells];
             for (int i = 0; i < numCells; i++) {
-                sectors[i] = Util.readSector(file);
+                sectors[i] = Util.readSector(dataBuffer);
             }
         } catch (IOException e) {
             throw new SpectralisException(e);

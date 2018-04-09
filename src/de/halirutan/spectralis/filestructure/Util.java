@@ -1,19 +1,20 @@
 package de.halirutan.spectralis.filestructure;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class Util {
 
-    private static final String CHARSET = "US-ASCII";
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
     private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
     private static final LocalDateTime START_TIME = LocalDateTime.of(1601, 1, 1, 0, 0);
     private static final long DATE_SCALE = 10000000L;
@@ -24,53 +25,62 @@ public class Util {
     }
 
     static String readString(RandomAccessFile file, int size) throws IOException {
-        byte result[] = new byte[size];
-        file.read(result, 0, size);
-        return new String(result, Charset.forName(CHARSET));
+        byte[] result = new byte[size];
+        file.read(result);
+        return new String(result);
     }
 
     static String readStringTrimmed(RandomAccessFile file, int size) throws IOException {
         return readString(file, size).trim();
     }
 
-    static float[] readFloatArray(DataInput file, int size) throws IOException {
-        float [] result = new float[size];
-        for (int i = 0; i < size; i++) {
-            result[i] = file.readFloat();
+    static String getString(ByteBuffer buffer, int size) {
+        byte[] result = new byte[size];
+        buffer.get(result);
+        return new String(result, CHARSET);
+    }
+
+    static String getStringTrimmed(ByteBuffer buffer, int numChars) {
+        return getString(buffer, numChars).trim();
+    }
+
+    static float[] getFloatArray(ByteBuffer buffer, int numFloats) {
+        float[] result = new float[numFloats];
+        for (int i = 0; i < numFloats; i++) {
+            result[i] = buffer.getFloat();
         }
         return result;
     }
 
-    static double[] readDoubleArray(DataInput file, int size) throws IOException {
-        double [] result = new double[size];
-        for (int i = 0; i < size; i++) {
-            result[i] = file.readDouble();
+    static double[] getDoubleArray(ByteBuffer buffer, int numDoubles) {
+        double[] result = new double[numDoubles];
+        for (int i = 0; i < numDoubles; i++) {
+            result[i] = buffer.getDouble();
         }
         return result;
     }
 
-    static int[] readIntArray(DataInput file, int size) throws IOException {
-        int [] result = new int[size];
+    static int[] getIntArray(ByteBuffer buffer, int size) {
+        int[] result = new int[size];
         for (int i = 0; i < size; i++) {
-            result[i] = file.readInt();
+            result[i] = buffer.getInt();
         }
         return result;
     }
 
-    static LocalDateTime readExamTime(RandomAccessFile file) throws IOException {
-        ByteBuffer buffer = readIntoBuffer(file, DataTypes.ExamTime);
+
+    static LocalDateTime readExamTime(ByteBuffer buffer) {
         long seconds = buffer.getLong() / DATE_SCALE;
         return START_TIME.plus(seconds, ChronoUnit.SECONDS);
     }
 
-    static LocalDateTime readDate(RandomAccessFile file) throws IOException {
-        ByteBuffer buffer = readIntoBuffer(file, DataTypes.Date);
+    static LocalDateTime readDate(ByteBuffer buffer) {
         return toLocalDateTime(buffer.getDouble());
     }
 
-    static Sector readSector(DataInput file) throws IOException {
-        float thickness = file.readFloat();
-        float volume = file.readFloat();
+    static Sector readSector(ByteBuffer buffer) {
+        float thickness = buffer.getFloat();
+        float volume = buffer.getFloat();
         return new Sector(thickness, volume);
     }
 
@@ -82,10 +92,11 @@ public class Util {
      * @return The bytes read, wrapped into a {@link ByteBuffer}
      * @throws IOException if something went wrong during reading
      */
-    static ByteBuffer readIntoBuffer(RandomAccessFile file, int size) throws IOException {
+    static ByteBuffer readIntoBuffer(RandomAccessFile file, int offset, int size) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(size);
         buffer.order(BYTE_ORDER);
-        file.read(buffer.array(), 0, size);
+        file.seek(offset);
+        file.read(buffer.array());
         return buffer;
     }
 
@@ -101,5 +112,4 @@ public class Util {
 
         return ZERO_COM_TIME.plusDays(daysAfterZero.intValue()).plus(fractionMillisAfterZero.longValue(), ChronoUnit.MILLIS);
     }
-
 }

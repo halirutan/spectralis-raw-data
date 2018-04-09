@@ -14,7 +14,6 @@ import static de.halirutan.spectralis.Util.WILLIS_716_4;
 import static de.halirutan.spectralis.Util.getVolFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by patrick on 10.01.17.
@@ -33,6 +32,7 @@ public class FileHeaderTest {
     public void testReadHeader() throws Exception {
 
     }
+
 
     @Test
     public final void readInvalid() throws Exception {
