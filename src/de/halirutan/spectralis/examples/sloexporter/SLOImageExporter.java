@@ -1,4 +1,4 @@
-package de.halirutan.spectralis.gui.sloexporter;
+package de.halirutan.spectralis.examples.sloexporter;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

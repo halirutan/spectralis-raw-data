@@ -1,4 +1,4 @@
-package de.halirutan.spectralis;
+package de.halirutan.spectralis.examples;
 
 import de.halirutan.spectralis.filestructure.HSFVersion;
 import de.halirutan.spectralis.filestructure.SLOImage;
@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  */
 public class ExportSLO {
 
-    static Logger LOG = Logger.getLogger("#de.halirutan.spectralis.ExportSLO");
+    static Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.ExportSLO");
 
     public static void main(String[] args) {
         if (args.length != 1) {

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" prefHeight="381.0" prefWidth="380.0" spacing="5.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.halirutan.spectralis.gui.sloexporter.Controller">
+<VBox fx:id="root" prefHeight="381.0" prefWidth="380.0" spacing="5.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.halirutan.spectralis.examples.sloexporter.Controller">
    <children>
       <HBox spacing="10.0">
          <children>

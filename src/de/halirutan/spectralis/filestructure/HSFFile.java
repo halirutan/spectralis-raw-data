@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 import de.halirutan.spectralis.SpectralisException;
 
 /**
- * Created by patrick on 10.01.17.
+ *
  * (c) Patrick Scheibe 2017
  */
 public class HSFFile {
@@ -47,7 +47,7 @@ public class HSFFile {
         try {
             int sloWidth = info.getSizeXSlo();
             int sloHeight = info.getSizeYSlo();
-            ByteBuffer buffer = Util.readIntoBuffer(file, SLO_FILE_OFFSET,sloWidth * sloHeight);
+            ByteBuffer buffer = Util.readIntoBuffer(file, SLO_FILE_OFFSET, sloWidth * sloHeight);
             sloImage = new SLOImage(sloWidth, sloHeight, buffer.array());
         } catch (IOException e) {
             LOG.log(Level.WARNING, "Error reading the SLO image", e);
@@ -62,15 +62,70 @@ public class HSFFile {
             throw new SpectralisException("BScan index out of bounds.");
         }
         int bsBlkSize = info.getBScanHdrSize() + (info.getSizeX() * info.getSizeZ() * DataTypes.Float);
+        List<BScanHeader> result = new ArrayList<>(count);
         for (int i = start; i < (start + count); i++) {
-            // TODO: implement
+            result.add(
+                    new BScanHeader(file, bScanOffset + (i * bsBlkSize), info.getBScanHdrSize())
+            );
         }
+        return result;
+    }
 
+    public final List<BScanHeader> getAllBScanHeaders() throws SpectralisException {
+        return getBScanHeaders(0, info.getNumBScans());
+    }
 
+    public final BScanHeader getBScanHeader(int index) throws SpectralisException {
+        return getBScanHeaders(index, 1).get(0);
     }
 
     /**
-     * Reads only the thickness-grid from an OCT file
+     * Get all BScans as list
+     *
+     * @return List of BScans
+     * @throws SpectralisException Error during reading
+     */
+    public final List<BScanData> getAllBScanData() throws SpectralisException {
+        return getBScanData(0, info.getNumBScans());
+    }
+
+    /**
+     * Get exactly one BScan
+     *
+     * @param i The BScan number to read
+     * @return BScan
+     * @throws SpectralisException Error during reading
+     */
+    public final BScanData getBScanData(int i) throws SpectralisException {
+        List<BScanData> bScans = getBScanData(i, 1);
+        return bScans.get(0);
+    }
+
+    private List<BScanData> getBScanData(int start, int count) throws SpectralisException {
+        int bScanHdrSize = info.getBScanHdrSize();
+        int sizeX = info.getSizeX();
+        int sizeZ = info.getSizeZ();
+        int numBScans = info.getNumBScans();
+        if ((start < 0) || ((start + count) > numBScans)) {
+            throw new SpectralisException("Not enough available BScans in dataset");
+        }
+
+        List<BScanData> bScans = new ArrayList<>(count);
+        int bsBlkSize = bScanHdrSize + (sizeX * sizeZ * DataTypes.Float);
+        for (int i = start; i < (start + count); i++) {
+            // Refer to the manual if the offset calculation is too cryptic.
+            // First BScan in the file is after the SLO image -> bscanOffset
+            // bsBlkSize is the size of a BScan block consisting of header and data
+            // The data follows after the header, so we need to add the BScanHeader size to the offset
+            int offset = bScanOffset + (i * bsBlkSize) + bScanHdrSize;
+            BScanData bs = new BScanData(file, offset, sizeX, sizeZ);
+            bScans.add(bs);
+        }
+        return bScans;
+    }
+
+    /**
+     * Reads the thickness-grid from an OCT file
      *
      * @param gridNumber Either 1 or 2 for the first or the second grid
      * @return The grid or null
@@ -110,46 +165,6 @@ public class HSFFile {
         return result;
     }
 
-    /**
-     * Get all BScans as list
-     *
-     * @return List of BScans
-     * @throws SpectralisException Error during reading
-     */
-    public final List<BScanData> getBScanData() throws SpectralisException {
-        return getBScanData(0, info.getNumBScans());
-    }
-
-    /**
-     * Get exactly one BScan
-     *
-     * @param i The BScan number to read
-     * @return BScan
-     * @throws SpectralisException Error during reading
-     */
-    public final BScanData getBScanData(int i) throws SpectralisException {
-        List<BScanData> bScans = getBScanData(i, 1);
-        return bScans.get(0);
-    }
-
-    private List<BScanData> getBScanData(int start, int count) throws SpectralisException {
-        int bScanHdrSize = info.getBScanHdrSize();
-        int sizeX = info.getSizeX();
-        int sizeZ = info.getSizeZ();
-        int numBScans = info.getNumBScans();
-        if ((start < 0) || ((start + count) > numBScans)) {
-            throw new SpectralisException("Not enough available BScans in dataset");
-        }
-
-        List<BScanData> bScans = new ArrayList<>(count);
-        int bsBlkSize = bScanHdrSize + (sizeX * sizeZ * DataTypes.Float);
-        for (int i = start; i < (start + count); i++) {
-            int offset = bScanOffset + (i * bsBlkSize);
-            BScanData bs = new BScanData(file, offset, sizeX, sizeZ);
-            bScans.add(bs);
-        }
-        return bScans;
-    }
 
     public final FileHeader getInfo() {
         return info;

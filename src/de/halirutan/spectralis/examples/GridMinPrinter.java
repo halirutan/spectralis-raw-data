@@ -1,9 +1,10 @@
-package de.halirutan.spectralis;
+package de.halirutan.spectralis.examples;
 
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
 import de.halirutan.spectralis.filestructure.Grid;
 import de.halirutan.spectralis.filestructure.HSFFile;
@@ -14,7 +15,7 @@ import de.halirutan.spectralis.filestructure.HSFFile;
  */
 public class GridMinPrinter {
 
-    private static Logger LOG = Logger.getLogger("#de.halirutan.spectralis.GridMinPrinter");
+    private static Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.GridMinPrinter");
 
     public static void main(String[] args) {
         if (args.length < 1) {

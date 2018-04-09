@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.halirutan.spectralis.filestructure.BScanHeader;
 import de.halirutan.spectralis.filestructure.FileHeader;
 import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.HSFVersion;
@@ -15,7 +16,6 @@ import de.halirutan.spectralis.filestructure.HSFVersion;
 public class InformationPrinter {
 
     private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.InformationPrinter");
-    private static String fileName = "/home/patrick/workspace/projects/spectralis-raw-data/test-data/valid.vol";
 
     private static final String nl = System.getProperty("line.separator");
     private static final StringBuilder builder = new StringBuilder(100);
@@ -25,8 +25,11 @@ public class InformationPrinter {
     }
 
     public static void main(String[] args) {
-
-        File file = new File(fileName);
+        if (args.length == 0) {
+            System.out.println("No file given");
+            return;
+        }
+        File file = new File(args[0]);
         if (file.exists() && file.canRead() && (HSFVersion.readVersion(file) != HSFVersion.INVALID)) {
             try {
                 HSFFile hsfFile = new HSFFile(file);
@@ -67,9 +70,24 @@ public class InformationPrinter {
                 format("Grid 2 Type:", info.getGridType2());
                 format("Grid 2 Offset:", info.getGridOffset2());
                 format("Prog ID:", info.getProgId());
+
+                if (info.getNumBScans() > 0) {
+                    BScanHeader bScanHeader = hsfFile.getBScanHeader(0);
+                    format(nl + "Information of 1st BScan", nl);
+                    format("Size", bScanHeader.getbScanHdrSize());
+                    format("Start X", bScanHeader.getStartX());
+                    format("Start Y", bScanHeader.getStartY());
+                    format("End X", bScanHeader.getEndX());
+                    format("End Y", bScanHeader.getEndY());
+                    format("Number Segmentations", bScanHeader.getNumSeg());
+                    format("Quality", bScanHeader.getQuality());
+                    format("Shift", bScanHeader.getShift());
+                }
+
                 System.out.println(builder);
+                hsfFile.close();
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Could not write file", e);
+                LOG.log(Level.WARNING, "Could not open file", e);
             }
         }
     }

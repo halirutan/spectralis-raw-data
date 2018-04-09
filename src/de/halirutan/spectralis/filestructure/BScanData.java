@@ -1,5 +1,9 @@
 package de.halirutan.spectralis.filestructure;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferFloat;
+import java.awt.image.Raster;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -48,6 +52,20 @@ public class BScanData {
 
     public final float[][] getContents() {
         return contents;
+    }
+
+    public final BufferedImage getImage() {
+        byte[] pixelData = new byte[width*height];
+        for (int j = 0; j < height; j++) {
+            for (int i = 0; i < width; i++) {
+
+                double value = (255.0 * StrictMath.pow(contents[j][i], 0.25));
+                pixelData[(j * width) + i] = (byte) value;
+            }
+        }
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        img.setData(Raster.createRaster(img.getSampleModel(), new DataBufferByte(pixelData, pixelData.length), null));
+        return img;
     }
 
 }

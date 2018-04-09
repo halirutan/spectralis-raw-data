@@ -1,25 +1,5 @@
-package de.halirutan.spectralis.gui.sloexporter;
+package de.halirutan.spectralis.examples.sloexporter;
 
-import de.halirutan.spectralis.filestructure.HSFVersion;
-import de.halirutan.spectralis.filestructure.SLOImage;
-import de.halirutan.spectralis.filestructure.HSFFile;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +7,31 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.ResourceBundle;
+
+import javax.imageio.ImageIO;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Window;
+
+import de.halirutan.spectralis.SpectralisException;
+import de.halirutan.spectralis.filestructure.HSFFile;
+import de.halirutan.spectralis.filestructure.HSFVersion;
+import de.halirutan.spectralis.filestructure.SLOImage;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Created by patrick on 12.01.17.
@@ -42,8 +47,8 @@ public class Controller implements Initializable {
 
     private ObservableList<File> listViewItems;
 
-    private List<File> myFiles = new ArrayList<>();
-    private List<File> myDirectories = new ArrayList<>();
+    final Collection<File> myFiles = new ArrayList<>();
+    final Collection<File> myDirectories = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -77,7 +82,7 @@ public class Controller implements Initializable {
     public void exportFiles() {
         File outputDir = showDirectorySelectDialog("Select output directory");
         if (!outputDir.canWrite()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Cannot write to output directory");
+            Alert alert = new Alert(AlertType.ERROR, "Cannot write to output directory");
             alert.show();
         }
 
@@ -98,7 +103,7 @@ public class Controller implements Initializable {
         Window window = root.getScene().getWindow();
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select .vol files or directories");
-        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Raw Volume files", "vol"));
+        fileChooser.setSelectedExtensionFilter(new ExtensionFilter("Raw Volume files", "vol"));
         return fileChooser.showOpenMultipleDialog(window);
     }
 
@@ -115,18 +120,18 @@ public class Controller implements Initializable {
 
     private class ExportWorker extends Task<Integer> {
 
-        File outputDirectory;
+        private File outputDirectory;
 
-        ExportWorker(File outputDirectory) {
-            this.outputDirectory = outputDirectory;
+        ExportWorker(File outDir) {
+            outputDirectory = outDir;
             statusBar.textProperty().unbind();
-            statusBar.textProperty().bind(this.messageProperty());
+            statusBar.textProperty().bind(messageProperty());
         }
 
         @Override
         protected void succeeded() {
             Integer value = getValue();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Alert alert = new Alert(AlertType.INFORMATION);
             String text;
             switch (value) {
                 case 0:
@@ -147,7 +152,7 @@ public class Controller implements Initializable {
 
         @Override
         protected void failed() {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error");
             alert.setTitle(getMessage());
             if (getException() != null) {
@@ -163,10 +168,9 @@ public class Controller implements Initializable {
         }
 
         @Override
-        protected Integer call() throws Exception {
-            int numOfExportedImages = 0;
-            List<File> myRealVolFiles = new ArrayList<>(myFiles.size());
-            if (myDirectories.size() > 0) {
+        protected Integer call() throws SpectralisException {
+            Collection<File> myRealVolFiles = new ArrayList<>(myFiles.size());
+            if (!myDirectories.isEmpty()) {
                 for (File directory : myDirectories) {
                     boolean recursively = checkDiveInto.isSelected();
                     Collection<File> files = FileUtils.listFiles(directory, new String[]{"vol"}, recursively);
@@ -188,28 +192,26 @@ public class Controller implements Initializable {
                     updateMessage("Adding " + baseName + " for export");
                 } else {
                     updateMessage("File " + baseName + " is not a valid Spectralis file.");
-                    throw new Exception("Wrong file format");
+                    throw new SpectralisException("Wrong file format");
                 }
             }
 
+            int numOfExportedImages = 0;
             for (File volFile : myRealVolFiles) {
                 HSFFile hsfFile = new HSFFile(volFile);
                 SLOImage img = hsfFile.getSLOImage();
                 String baseName = FilenameUtils.getBaseName(volFile.getName());
                 updateMessage("Exporting SLO from " + baseName);
                 if (img != null) {
-                    String outName = FilenameUtils.concat(outputDirectory.getAbsolutePath(), baseName + ".png");
+                    String outName = FilenameUtils.concat(getOutputDirectory().getAbsolutePath(), baseName + ".png");
                     try {
                         File outFile = new File(outName);
-                        if (!outFile.canWrite()) {
-                            throw new Exception("Cannot create image file. Missing permissions?");
-                        }
                         ImageIO.write(img.getImage(), "png",
                                 outFile);
                         numOfExportedImages++;
                     } catch (IOException e) {
                         updateMessage("An error occurred when writing " + outName);
-                        throw e;
+                        throw new SpectralisException(e);
                     }
                 } else {
                     updateMessage("Could not extract SLO image from " + baseName);
@@ -220,6 +222,9 @@ public class Controller implements Initializable {
             return numOfExportedImages;
         }
 
+        File getOutputDirectory() {
+            return outputDirectory;
+        }
     }
 
 
