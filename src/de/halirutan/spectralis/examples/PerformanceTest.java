@@ -28,7 +28,7 @@ public class PerformanceTest {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.out.println("No file given");
+            LOG.log(Level.WARNING,"No input file given");
             return;
         }
         File file = new File(args[0]);
@@ -44,8 +44,10 @@ public class PerformanceTest {
                 System.out.println(builder);
                 hsfFile.close();
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Could not open file", e);
+                LOG.log(Level.WARNING, "Error reading file", e);
             }
+        } else {
+            LOG.log(Level.WARNING, "Cannot open file or no valid vol file");
         }
     }
 }
