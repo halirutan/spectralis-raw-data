@@ -4,8 +4,8 @@ import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import de.halirutan.spectralis.filestructure.BScanHeader;
-import de.halirutan.spectralis.filestructure.FileHeader;
+import de.halirutan.spectralis.filestructure.BScanInfo;
+import de.halirutan.spectralis.filestructure.FileInfo;
 import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.HSFVersion;
 
@@ -33,7 +33,7 @@ public class InformationPrinter {
         if (file.exists() && file.canRead() && (HSFVersion.readVersion(file) != HSFVersion.INVALID)) {
             try {
                 HSFFile hsfFile = new HSFFile(file);
-                FileHeader info = hsfFile.getInfo();
+                FileInfo info = hsfFile.getInfo();
                 format("Filename:", file.getName());
 
                 format(nl + "Scan information", nl);
@@ -72,16 +72,16 @@ public class InformationPrinter {
                 format("Prog ID:", info.getProgId());
 
                 if (info.getNumBScans() > 0) {
-                    BScanHeader bScanHeader = hsfFile.getBScanHeader(0);
+                    BScanInfo bScanInfo = hsfFile.getBScanInfo(0);
                     format(nl + "Information of 1st BScan", nl);
-                    format("Size", bScanHeader.getbScanHdrSize());
-                    format("Start X", bScanHeader.getStartX());
-                    format("Start Y", bScanHeader.getStartY());
-                    format("End X", bScanHeader.getEndX());
-                    format("End Y", bScanHeader.getEndY());
-                    format("Number Segmentations", bScanHeader.getNumSeg());
-                    format("Quality", bScanHeader.getQuality());
-                    format("Shift", bScanHeader.getShift());
+                    format("Size", bScanInfo.getbScanHdrSize());
+                    format("Start X", bScanInfo.getStartX());
+                    format("Start Y", bScanInfo.getStartY());
+                    format("End X", bScanInfo.getEndX());
+                    format("End Y", bScanInfo.getEndY());
+                    format("Number Segmentations", bScanInfo.getNumSeg());
+                    format("Quality", bScanInfo.getQuality());
+                    format("Shift", bScanInfo.getShift());
                 }
 
                 System.out.println(builder);

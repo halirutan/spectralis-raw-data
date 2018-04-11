@@ -12,15 +12,19 @@ import java.util.logging.Logger;
 import de.halirutan.spectralis.SpectralisException;
 
 /**
- *
+ *  Provides the main access point to a HSF file.
  * (c) Patrick Scheibe 2017
  */
 public class HSFFile {
 
+    // Special value that is used to mark a value as invalid. This happens when e.g. the segmentation of a layer was
+    // not possible
+    public static final float INVALID_FLOAT_VALUE = Float.intBitsToFloat(0x7F7FFFFF);
+
     private static final int SLO_FILE_OFFSET = 2048;
     private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.filestructure.HSFFile");
     private final RandomAccessFile file;
-    private final FileHeader info;
+    private final FileInfo info;
     private final HSFVersion version;
     private final int bScanOffset;
     private SLOImage sloImage;
@@ -32,7 +36,7 @@ public class HSFFile {
         }
         try {
             file = new RandomAccessFile(inFile, "r");
-            info = new FileHeader(file);
+            info = new FileInfo(file);
             bScanOffset = SLO_FILE_OFFSET + (info.getSizeXSlo() * info.getSizeYSlo());
         } catch (IOException e) {
             LOG.log(Level.WARNING, "Error opening file", e);
@@ -56,27 +60,32 @@ public class HSFFile {
         return sloImage;
     }
 
-    public final List<BScanHeader> getBScanHeaders(int start, int count) throws SpectralisException {
+    /**
+     * Provides a list of all available BScan headers which contain information about the position, segmentation, etc.
+     * @return List of all available BScanHeaders
+     * @throws SpectralisException
+     */
+    public final List<BScanInfo> getBScanInfo() throws SpectralisException {
+        return getBScanInfo(0, info.getNumBScans());
+    }
+
+    public final List<BScanInfo> getBScanInfo(int start, int count) throws SpectralisException {
         if ((start < 0) || (count < 1) || ((start + count) > info.getNumBScans())) {
             LOG.log(Level.WARNING, "Cannot access " + count + " BScans starting from " + start);
             throw new SpectralisException("BScan index out of bounds.");
         }
         int bsBlkSize = info.getBScanHdrSize() + (info.getSizeX() * info.getSizeZ() * DataTypes.Float);
-        List<BScanHeader> result = new ArrayList<>(count);
+        List<BScanInfo> result = new ArrayList<>(count);
         for (int i = start; i < (start + count); i++) {
             result.add(
-                    new BScanHeader(file, bScanOffset + (i * bsBlkSize), info.getBScanHdrSize())
+                    new BScanInfo(file, bScanOffset + (i * bsBlkSize), info.getBScanHdrSize())
             );
         }
         return result;
     }
 
-    public final List<BScanHeader> getAllBScanHeaders() throws SpectralisException {
-        return getBScanHeaders(0, info.getNumBScans());
-    }
-
-    public final BScanHeader getBScanHeader(int index) throws SpectralisException {
-        return getBScanHeaders(index, 1).get(0);
+    public final BScanInfo getBScanInfo(int index) throws SpectralisException {
+        return getBScanInfo(index, 1).get(0);
     }
 
     /**
@@ -85,7 +94,7 @@ public class HSFFile {
      * @return List of BScans
      * @throws SpectralisException Error during reading
      */
-    public final List<BScanData> getAllBScanData() throws SpectralisException {
+    public final List<BScanData> getBScanData() throws SpectralisException {
         return getBScanData(0, info.getNumBScans());
     }
 
@@ -116,12 +125,26 @@ public class HSFFile {
             // Refer to the manual if the offset calculation is too cryptic.
             // First BScan in the file is after the SLO image -> bscanOffset
             // bsBlkSize is the size of a BScan block consisting of header and data
-            // The data follows after the header, so we need to add the BScanHeader size to the offset
+            // The data follows after the header, so we need to add the BScanInfo size to the offset
             int offset = bScanOffset + (i * bsBlkSize) + bScanHdrSize;
             BScanData bs = new BScanData(file, offset, sizeX, sizeZ);
             bScans.add(bs);
         }
         return bScans;
+    }
+
+    public final List<LayerSegmentation> getLayerSegmentation() throws SpectralisException {
+        List<BScanInfo> bScanInfo = getBScanInfo();
+        List<LayerSegmentation> layers = new ArrayList<>(bScanInfo.size());
+        for (BScanInfo scan : bScanInfo) {
+            layers.add(new LayerSegmentation(info, scan));
+        }
+        return layers;
+    }
+
+    public final LayerSegmentation getLayerSegmentation(int index) throws SpectralisException {
+        BScanInfo bScanInfo = getBScanInfo(index);
+        return new LayerSegmentation(info, bScanInfo);
     }
 
     /**
@@ -166,7 +189,7 @@ public class HSFFile {
     }
 
 
-    public final FileHeader getInfo() {
+    public final FileInfo getInfo() {
         return info;
     }
 

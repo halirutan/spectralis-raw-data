@@ -1,6 +1,5 @@
 package de.halirutan.spectralis.filestructure;
 
-import java.io.DataInput;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;

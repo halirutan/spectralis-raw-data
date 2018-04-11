@@ -6,8 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import de.halirutan.spectralis.filestructure.BScanData;
-import de.halirutan.spectralis.filestructure.BScanHeader;
-import de.halirutan.spectralis.filestructure.FileHeader;
+import de.halirutan.spectralis.filestructure.BScanInfo;
+import de.halirutan.spectralis.filestructure.FileInfo;
 import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.HSFVersion;
 
@@ -35,11 +35,11 @@ public class PerformanceTest {
         if (file.exists() && file.canRead() && (HSFVersion.readVersion(file) != HSFVersion.INVALID)) {
             try {
                 HSFFile hsfFile = new HSFFile(file);
-                FileHeader info = hsfFile.getInfo();
-                List<BScanHeader> allBScanHeaders = hsfFile.getAllBScanHeaders();
-                List<BScanData> allBScanData = hsfFile.getAllBScanData();
+                FileInfo info = hsfFile.getInfo();
+                List<BScanInfo> allBScanInfos = hsfFile.getBScanInfo();
+                List<BScanData> allBScanData = hsfFile.getBScanData();
                 format("File Name", file.getName());
-                format("Number BScans headers", allBScanHeaders.size());
+                format("Number BScans headers", allBScanInfos.size());
                 format("Number BScans", allBScanData.size());
                 System.out.println(builder);
                 hsfFile.close();

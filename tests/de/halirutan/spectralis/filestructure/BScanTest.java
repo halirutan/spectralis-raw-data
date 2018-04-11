@@ -9,7 +9,7 @@ public class BScanTest {
 //    @Test
 //    public void read() throws Exception {
 //        final RandomAccessFile f = new RandomAccessFile(Util.VALID);
-//        final FileHeader header = FileHeader.readHeader(f);
+//        final FileInfo header = FileInfo.readHeader(f);
 //        final Integer sizeXSlo = DataFragment.getIntegerValue(header.get(FileHeaderContent.SizeXSlo));
 //        final Integer sizeYSlo = DataFragment.getIntegerValue(header.get(FileHeaderContent.SizeYSlo));
 //

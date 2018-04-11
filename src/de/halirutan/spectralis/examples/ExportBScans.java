@@ -32,7 +32,7 @@ public class ExportBScans {
             try {
                 String outputPath = file.getParent();
                 HSFFile hsfFile = new HSFFile(file);
-                List<BScanData> bScanData = hsfFile.getAllBScanData();
+                List<BScanData> bScanData = hsfFile.getBScanData();
                 int i = 0;
                 for (BScanData scan: bScanData) {
                     String name = outputPath + String.format("%s%05d.png", SEPARATOR, i);

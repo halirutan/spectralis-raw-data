@@ -13,6 +13,7 @@ import java.net.URL;
 public class Util {
     public static final String VALID = "valid.vol";
     public static final String INVALID = "invalid.vol";
+    public static final String LAYERS = "layers.vol";
     public static final String WILLIS_712 = "Willis_B_712.vol";
     public static final String WILLIS_713 = "Willis_B_713.vol";
     public static final String WILLIS_714 = "Willis_B_714.vol";
