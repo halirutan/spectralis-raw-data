@@ -34,7 +34,6 @@
     </inspection_tool>
     <inspection_tool class="AnonymousClassVariableHidesContainingMethodVariable" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="ArrayEquality" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="ArrayLengthInLoopCondition" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssertAsName" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssertEqualsCalledOnArray" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="AssertEqualsMayBeAssertSame" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -504,6 +503,15 @@
     <inspection_tool class="NestingDepth" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="m_limit" value="5" />
     </inspection_tool>
+    <inspection_tool class="NewClassNamingConvention" enabled="false" level="WARNING" enabled_by_default="false">
+      <extension name="AbstractClassNamingConvention" enabled="true" />
+      <extension name="AnnotationNamingConvention" enabled="true" />
+      <extension name="EnumeratedClassNamingConvention" enabled="true" />
+      <extension name="InterfaceNamingConvention" enabled="true" />
+      <extension name="JUnitAbstractTestClassNamingConvention" enabled="true" />
+      <extension name="JUnitTestClassNamingConvention" enabled="true" />
+      <extension name="TypeParameterNamingConvention" enabled="true" />
+    </inspection_tool>
     <inspection_tool class="NewExceptionWithoutArguments" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NonExceptionNameEndsWithException" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="NonFinalClone" enabled="true" level="WARNING" enabled_by_default="true" />
@@ -747,6 +755,7 @@
           <option value="ClassWithTooManyMethods" />
           <option value="ClassWithoutNoArgConstructor" />
           <option value="MethodWithMultipleLoops" />
+          <option value="ChainOfInstanceofChecks" />
         </list>
       </option>
     </inspection_tool>
