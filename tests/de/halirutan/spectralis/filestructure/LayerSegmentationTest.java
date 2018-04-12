@@ -20,14 +20,9 @@ public class LayerSegmentationTest {
         for (RetinalLayer l : layers.values()) {
             float[] values = l.getLayer();
             Assert.assertNotNull(values);
-            StringBuilder builder = new StringBuilder(l.getName().name());
-            builder.append(": ");
             for (float value : values) {
                 Assert.assertTrue("Layer value not positive", value > 0);
-                builder.append(String.format("0x%8s ", Integer.toHexString(Float.floatToIntBits(value)).replace(' ', '0')));
             }
-            System.out.println(builder);
-            System.out.println(HSFFile.INVALID_FLOAT_VALUE);
         }
     }
 

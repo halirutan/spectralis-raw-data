@@ -78,7 +78,7 @@ public class FileInfo {
         scaleYSlo = buffer.getDouble();
         fieldSizeSlo = buffer.getInt();
         scanFocus = buffer.getDouble();
-        scanPosition = Util.getString(buffer, SCAN_POSITION_BYTE_COUNT);
+        scanPosition = Util.getStringTrimmed(buffer, SCAN_POSITION_BYTE_COUNT);
         examTime = Util.readExamTime(buffer);
         scanPattern = buffer.getInt();
         bScanHdrSize = buffer.getInt();

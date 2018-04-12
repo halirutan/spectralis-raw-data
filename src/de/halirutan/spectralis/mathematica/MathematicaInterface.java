@@ -27,7 +27,7 @@ import de.halirutan.spectralis.filestructure.Sector;
 import de.halirutan.spectralis.filestructure.LayerSegmentation;
 
 /**
- * Created by patrick on 20.02.18.
+ * Simple wrapper functions for the Spectralis API that allows to call it from within Mathematica
  * (c) Patrick Scheibe 2018
  */
 @SuppressWarnings("unused")
@@ -38,24 +38,6 @@ public class MathematicaInterface {
     private static final Expr ASSOCIATION = new Expr(Expr.SYMBOL, "Association");
     private static final Expr DATE_OBJECT = new Expr(Expr.SYMBOL, "DateObject");
     private static final Expr FAILED = new Expr(Expr.SYMBOL, "$FAILED");
-
-    public static float getGrid(String fileName) {
-        try {
-            HSFFile hsfFile = new HSFFile(new File(fileName));
-            Grid grid = hsfFile.getThicknessGrid(1);
-            KernelLink link = StdLink.getLink();
-            if ((grid != null) && (link != null)) {
-                if (grid.getGridType() == GridType.CIRCULAR_ETDRS) {
-                    FileInfo fileInfo = hsfFile.getInfo();
-                    CircularThicknessGrid g = (CircularThicknessGrid) grid;
-                    return "OD".equals(fileInfo.getScanPosition()) ? g.getMinCentralThickness() : -g.getMinCentralThickness();
-                }
-            }
-        } catch (SpectralisException e) {
-            return 0.0f;
-        }
-        return 1.0f;
-    }
 
     public static Expr getInfo(String fileName) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
@@ -121,7 +103,15 @@ public class MathematicaInterface {
         for (int i = 0; i < size; i++) {
             result[i] = bScanData.get(i).getContents();
         }
+        hsfFile.close();
         return result;
+    }
+
+    public static float[][] getBScanData(String fileName, int index) throws SpectralisException {
+        HSFFile hsfFile = new HSFFile(new File(fileName));
+        BScanData bScan = hsfFile.getBScanData(index);
+        hsfFile.close();
+        return bScan.getContents();
     }
 
     public static Expr getLayerSegmentation(String fileName) throws SpectralisException {
