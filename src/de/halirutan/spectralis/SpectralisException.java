@@ -1,7 +1,7 @@
 package de.halirutan.spectralis;
 
 /**
- * Created by patrick on 05.03.18.
+ * General exception that is thrown when accessing the file went wrong
  * (c) Patrick Scheibe 2018
  */
 public class SpectralisException extends Exception {

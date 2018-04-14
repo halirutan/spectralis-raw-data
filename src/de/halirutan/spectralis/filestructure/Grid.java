@@ -1,9 +1,10 @@
 package de.halirutan.spectralis.filestructure;
 
 /**
- * Created by patrick on 14.02.18.
+ * Interface for the two different types of Grid that exist.
  * (c) Patrick Scheibe 2018
  */
+@FunctionalInterface
 public interface Grid {
     GridType getGridType();
 }

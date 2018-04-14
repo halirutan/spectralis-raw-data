@@ -1,7 +1,8 @@
 package de.halirutan.spectralis.filestructure;
 
 /**
- * Created by patrick on 06.04.18.
+ * Provides names of the available retinal layers. Tests have shown that up to 17 layers are provided. Unfortunately,
+ * the manual only describes 14 of them. This is the reason for the last unknown entries.
  * (c) Patrick Scheibe 2018
  */
 public enum LayerNames {

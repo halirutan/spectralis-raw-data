@@ -1,7 +1,7 @@
 package de.halirutan.spectralis.filestructure;
 
 /**
- * Created by patrick on 14.02.18.
+ * Grid-types as provided by the OCT
  * (c) Patrick Scheibe 2018
  */
 public enum GridType {
@@ -21,6 +21,7 @@ public enum GridType {
         myDescription = description;
     }
 
+    @SuppressWarnings("unused")
     public int getType() {
         return myType;
     }

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import com.sun.istack.internal.Nullable;
 
 /**
- * Created by patrick on 09.01.17.
+ * Provides available file versions.
  * (c) Patrick Scheibe 2017
  */
 @SuppressWarnings("unused")

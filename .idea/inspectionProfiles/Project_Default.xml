@@ -755,6 +755,11 @@
           <option value="ClassWithoutNoArgConstructor" />
           <option value="MethodWithMultipleLoops" />
           <option value="ChainOfInstanceofChecks" />
+          <option value="SameParameterValue" />
+          <option value="NumericCastThatLosesPrecision" />
+          <option value="FieldCanBeLocal" />
+          <option value="AccessOfSystemProperties" />
+          <option value="StringBufferField" />
         </list>
       </option>
     </inspection_tool>

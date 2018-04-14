@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.wolfram.jlink.Expr;
-import com.wolfram.jlink.KernelLink;
-import com.wolfram.jlink.StdLink;
 import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.UnsupportedVersionException;
 import de.halirutan.spectralis.filestructure.BScanData;
@@ -18,7 +16,6 @@ import de.halirutan.spectralis.filestructure.BScanInfo;
 import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
 import de.halirutan.spectralis.filestructure.FileInfo;
 import de.halirutan.spectralis.filestructure.Grid;
-import de.halirutan.spectralis.filestructure.GridType;
 import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.LayerNames;
 import de.halirutan.spectralis.filestructure.RectangularThicknessGrid;
@@ -27,11 +24,13 @@ import de.halirutan.spectralis.filestructure.Sector;
 import de.halirutan.spectralis.filestructure.LayerSegmentation;
 
 /**
- * Simple wrapper functions for the Spectralis API that allows to call it from within Mathematica
+ * Simple wrapper functions for the Spectralis API that allows to call it from within Mathematica.
+ * The general rule is that each function opens a file, extracts information, and closes the file. This is opposed to
+ * opening and loading the complete information within a file.
  * (c) Patrick Scheibe 2018
  */
 @SuppressWarnings("unused")
-public class MathematicaInterface {
+public class MmaHSF {
 
     private static final Expr[] EMPTY_EXPR_ARRAY = new Expr[0];
     private static final Expr RULE = new Expr(Expr.SYMBOL, "Rule");
@@ -39,6 +38,13 @@ public class MathematicaInterface {
     private static final Expr DATE_OBJECT = new Expr(Expr.SYMBOL, "DateObject");
     private static final Expr FAILED = new Expr(Expr.SYMBOL, "$FAILED");
 
+    /**
+     * Provides the general information about a scan. This is basically most of the information that can be found in the
+     * file header.
+     * @param fileName Input file
+     * @return An association with information about the scan
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static Expr getInfo(String fileName) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
         FileInfo info = hsfFile.getInfo();
@@ -76,6 +82,13 @@ public class MathematicaInterface {
         return new Expr(ASSOCIATION, content.toArray(EMPTY_EXPR_ARRAY));
     }
 
+    /**
+     * Provides a list with information about each BScan. This is the information that can be found in the header of each
+     * BScan.
+     * @param fileName Input file
+     * @return A List with information about each BScan
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static Expr getBScanInfo(String fileName) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
         List<BScanInfo> bScanInfo = hsfFile.getBScanInfo();
@@ -88,13 +101,27 @@ public class MathematicaInterface {
         return new Expr(Expr.SYM_LIST, infoList);
     }
 
+    /**
+     * Provides information about one specific BScan. This is the information that can be found in the header of each
+     * BScan.
+     * @param fileName Input file
+     * @param index Index of the BScan. Mathematica indexing is used and the possible range is from 1 to number of BScans
+     * @return Information about the BScan at index
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static Expr getBScanInfo(String fileName, int index) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
-        BScanInfo bScanInfo = hsfFile.getBScanInfo(index);
+        BScanInfo bScanInfo = hsfFile.getBScanInfo(index - 1);
         hsfFile.close();
         return bScanInfoToExpr(bScanInfo);
     }
 
+    /**
+     * Provides the raw scan values of one BScan.
+     * @param fileName Input file
+     * @return BScan data. Note that for an image representation you should use {@code Image[data^0.25]}.
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static float[][][] getBScanData(String fileName) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
         List<BScanData> bScanData = hsfFile.getBScanData();
@@ -107,6 +134,13 @@ public class MathematicaInterface {
         return result;
     }
 
+    /**
+     * Provides the raw scan values of one BScan.
+     * @param fileName Input file
+     * @param index Index of the BScan. Mathematica indexing is used and the possible range is from 1 to number of BScans
+     * @return BScan data. Note that for an image representation you should use {@code Image[data^0.25]}
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static float[][] getBScanData(String fileName, int index) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
         BScanData bScan = hsfFile.getBScanData(index);
@@ -114,20 +148,41 @@ public class MathematicaInterface {
         return bScan.getContents();
     }
 
+    /**
+     * Provides a list of all retinal layers that are segmented by the Spectralis OCT
+     * @param fileName Input file
+     * @return List of Associations which pixel values for each retinal layer
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static Expr getLayerSegmentation(String fileName) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
         List<LayerSegmentation> layerSegmentationLayers = hsfFile.getLayerSegmentation();
-        List<Expr> result = layerSegmentationLayers.stream().map(MathematicaInterface::segmentationLayerToExpr).collect(Collectors.toList());
+        List<Expr> result = layerSegmentationLayers.stream().map(MmaHSF::segmentationLayerToExpr).collect(Collectors.toList());
         hsfFile.close();
         return new Expr(Expr.SYM_LIST, result.toArray(EMPTY_EXPR_ARRAY));
     }
 
+    /**
+     * Provides a list of all retinal layers that are segmented by the Spectralis OCT
+     * @param fileName Input file
+     * @param index Index of the BScan. Mathematica indexing is used and the possible range is from 1 to number of BScans
+     * @return List of Associations which pixel values for each retinal layer
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static Expr getLayerSegmentation(String fileName, int index) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
-        LayerSegmentation segmentation = hsfFile.getLayerSegmentation(index);
+        LayerSegmentation segmentation = hsfFile.getLayerSegmentation(index - 1);
+        hsfFile.close();
         return segmentationLayerToExpr(segmentation);
     }
 
+    /**
+     * Provides a list of all retinal layers that are segmented by the Spectralis OCT
+     * @param fileName Input file
+     * @param gridNumber Either 1 or 2 for the first and second grid respectively
+     * @return Associations which the grid information
+     * @throws SpectralisException When opening or reading the file failed
+     */
     public static Expr getGrid(String fileName, int gridNumber) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
         Grid thicknessGrid = hsfFile.getThicknessGrid(gridNumber);
@@ -142,6 +197,11 @@ public class MathematicaInterface {
         return result;
     }
 
+    /**
+     * Provides the {@code INVALID} value that is used in e.g. the retinal layers to indicate that a value could not be obtained.
+     * With this, it is easy to replace invalid values with more sensible ones for specific situations.
+     * @return {@code INVALID} value as specified in the Spectralis manual
+     */
     public static Expr getInvalidFloatValue() {
         return new Expr(HSFFile.INVALID_FLOAT_VALUE);
     }

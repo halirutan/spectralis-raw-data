@@ -12,9 +12,15 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * Utility class that is heavily used for reading data from the file and from buffers. Note that the Spectralis OCT format
+ * uses little endian byte order. Since most systems use big endian, we cannot directly read e.g. floats or doubles from the
+ * file. The general approach is to read the complete chunk, e.g. the complete file header, into a {@link ByteBuffer} and
+ * then read containing values as specified in the Spectralis manual.
+ */
 public class Util {
 
-    private static final Charset CHARSET = StandardCharsets.UTF_8;
+    private static final Charset CHARSET = StandardCharsets.US_ASCII;
     private static final ByteOrder BYTE_ORDER = ByteOrder.LITTLE_ENDIAN;
     private static final LocalDateTime START_TIME = LocalDateTime.of(1601, 1, 1, 0, 0);
     private static final long DATE_SCALE = 10000000L;
@@ -24,24 +30,38 @@ public class Util {
     private Util() {
     }
 
-    static String readString(RandomAccessFile file, int size) throws IOException {
-        byte[] result = new byte[size];
-        file.read(result);
-        return new String(result);
-    }
-
+    /**
+     * Strings in the file are zero-terminated. Therefore, all provided strings like Id or PatientId are trimmed by default.
+     * @param file Input file
+     * @param size Number of bytes to be read
+     * @return Trimmed string
+     * @throws IOException If reading failed
+     */
+    @SuppressWarnings("SameParameterValue")
     static String readStringTrimmed(RandomAccessFile file, int size) throws IOException {
         return readString(file, size).trim();
     }
 
-    static String getString(ByteBuffer buffer, int size) {
+    private static String readString(RandomAccessFile file, int size) throws IOException {
+        byte[] result = new byte[size];
+        file.read(result);
+        return new String(result, CHARSET);
+    }
+
+    private static String getString(ByteBuffer buffer, int size) {
         byte[] result = new byte[size];
         buffer.get(result);
         return new String(result, CHARSET);
     }
 
-    static String getStringTrimmed(ByteBuffer buffer, int numChars) {
-        return getString(buffer, numChars).trim();
+    /**
+     * Strings in the file are zero-terminated. Therefore, all provided strings like Id or PatientId are trimmed by default.
+     * @param buffer Buffer to read from
+     * @param size Number of chars to be read
+     * @return Trimmed string
+     */
+    static String getStringTrimmed(ByteBuffer buffer, int size) {
+        return getString(buffer, size).trim();
     }
 
     static float[] getFloatArray(ByteBuffer buffer, int numFloats) {
@@ -60,6 +80,7 @@ public class Util {
         return result;
     }
 
+    @SuppressWarnings("SameParameterValue")
     static int[] getIntArray(ByteBuffer buffer, int size) {
         int[] result = new int[size];
         for (int i = 0; i < size; i++) {
@@ -67,7 +88,6 @@ public class Util {
         }
         return result;
     }
-
 
     static LocalDateTime readExamTime(ByteBuffer buffer) {
         long seconds = buffer.getLong() / DATE_SCALE;
@@ -99,7 +119,6 @@ public class Util {
         file.read(buffer.array());
         return buffer;
     }
-
 
     public static LocalDateTime toLocalDateTime(double d) {
         return toLocalDateTime(BigDecimal.valueOf(d));

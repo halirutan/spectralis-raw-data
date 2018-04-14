@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 import de.halirutan.spectralis.UnsupportedVersionException;
 
 /**
- * //TODO: use ByteBuffer instead of reading directly from the file. The default endianess is wrong
- * Created by patrick on 09.01.17.
+ * Provides information about a file which is stored in the file header. This contains global settings for the scan like
+ * resolution, scaling, and so on.
  * (c) Patrick Scheibe 2017
  */
 @SuppressWarnings({"unused", "OverlyLongMethod", "ClassWithTooManyMethods", "ClassWithoutNoArgConstructor"})

@@ -7,6 +7,10 @@ import java.nio.ByteBuffer;
 import de.halirutan.spectralis.SpectralisException;
 import de.halirutan.spectralis.UnsupportedVersionException;
 
+/**
+ * Provides information about a single BScan that contains its position, scan quality, etc.
+ */
+@SuppressWarnings("unused")
 public class BScanInfo {
     private final RandomAccessFile file;
     private final int offset;
@@ -29,7 +33,7 @@ public class BScanInfo {
     private int[] bmoCoordRight;
 
 
-    public BScanInfo(RandomAccessFile inputFile, int headerOffset, int headerSize) throws SpectralisException {
+    BScanInfo(RandomAccessFile inputFile, int headerOffset, int headerSize) throws SpectralisException {
         file = inputFile;
         size = headerSize;
         offset = headerOffset;
@@ -79,11 +83,11 @@ public class BScanInfo {
         return version;
     }
 
-    public final int getOffset() {
+    final int getOffset() {
         return offset;
     }
 
-    public final int getbScanHdrSize() {
+    public final int getBScanHdrSize() {
         return bScanHdrSize;
     }
 
@@ -107,8 +111,12 @@ public class BScanInfo {
         return numSeg;
     }
 
-    public final int getOffsetSeg() {
+    final int getOffsetSeg() {
         return offsetSeg;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public final float getQuality() throws UnsupportedVersionException {

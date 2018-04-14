@@ -5,7 +5,7 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 
 /**
- * Created by patrick on 10.01.17.
+ * Simple class to provide an 8bit gray image
  * (c) Patrick Scheibe 2017
  */
 public class SLOImage  {

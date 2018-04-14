@@ -7,14 +7,12 @@ import java.nio.ByteBuffer;
 import de.halirutan.spectralis.SpectralisException;
 
 /**
- * Provides access to the retinal thickness measurements inside one of the defined circular grids. The most popular one probably
- * being the one from the ETDRS which creates a nine-field circular grid
- * Created by patrick on 14.02.18.
+ * Provides access to the retinal thickness measurements inside a rectangular region.
  * (c) Patrick Scheibe 2018
  */
 public class RectangularThicknessGrid implements Grid {
 
-    private final int INFO_BYTE_SIZE = 40;
+    @SuppressWarnings("FieldCanBeLocal") private static final int INFO_BYTE_SIZE = 40;
 
     private final GridType type;
     private final int typeID;

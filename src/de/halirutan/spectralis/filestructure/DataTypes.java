@@ -1,9 +1,10 @@
 package de.halirutan.spectralis.filestructure;
 
 /**
- * Created by patrick on 11.01.17.
+ * Byte sizes of types used.
  * (c) Patrick Scheibe 2017
  */
+@SuppressWarnings("unused")
 public interface DataTypes {
     int Byte = 1;
     int Integer = 4;

@@ -17,8 +17,8 @@ public class InformationPrinter {
 
     private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.InformationPrinter");
 
-    private static final String nl = System.getProperty("line.separator");
-    private static final StringBuilder builder = new StringBuilder(100);
+    @SuppressWarnings("AccessOfSystemProperties") private static final String nl = System.getProperty("line.separator");
+    @SuppressWarnings("StringBufferField") private static final StringBuilder builder = new StringBuilder(100);
 
     private static void format(String key, Object val) {
         builder.append(String.format("%-20s %s%n", key, val));
@@ -74,7 +74,7 @@ public class InformationPrinter {
                 if (info.getNumBScans() > 0) {
                     BScanInfo bScanInfo = hsfFile.getBScanInfo(0);
                     format(nl + "Information of 1st BScan", nl);
-                    format("Size", bScanInfo.getbScanHdrSize());
+                    format("Size", bScanInfo.getBScanHdrSize());
                     format("Start X", bScanInfo.getStartX());
                     format("Start Y", bScanInfo.getStartY());
                     format("End X", bScanInfo.getEndX());

@@ -5,7 +5,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 
 /**
- * Created by patrick on 06.04.18.
+ * Provides access to exactly one retinal layer of a BScan.
  * (c) Patrick Scheibe 2018
  */
 public class RetinalLayer {

@@ -1,9 +1,7 @@
 package de.halirutan.spectralis.filestructure;
 
-import java.util.logging.Logger;
-
 /**
- * Created by patrick on 09.01.17.
+ * All available BScan versions
  * (c) Patrick Scheibe 2017
  */
 public enum BScanVersion {
@@ -13,8 +11,6 @@ public enum BScanVersion {
     HSF_BS_103("HSF-BS-103", 3),
     HSF_BS_104("HSF-BS-104", 4),
     INVALID("Invalid", -1);
-
-    private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.filestructure.BScanVersion");
 
     private final String versionString;
     private final int version;

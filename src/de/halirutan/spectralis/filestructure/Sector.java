@@ -1,27 +1,24 @@
 package de.halirutan.spectralis.filestructure;
 
-import de.halirutan.spectralis.filestructure.CircularThicknessGrid;
-
 /**
  * Provides retinal thickness within one cell of a thickness grid
  * @see CircularThicknessGrid
- * Created by patrick on 14.02.18.
  * (c) Patrick Scheibe 2018
  */
 public class Sector {
-    private float myThickness;
-    private float myVolume;
+    private final float thickness;
+    private final float volume;
 
-    Sector(float myThickness, float myVolume) {
-        this.myThickness = myThickness;
-        this.myVolume = myVolume;
+    Sector(float thick, float vol) {
+        thickness = thick;
+        volume = vol;
     }
 
     public float getThickness() {
-        return myThickness;
+        return thickness;
     }
 
     public float getVolume() {
-        return myVolume;
+        return volume;
     }
 }
