@@ -35,12 +35,12 @@ import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.HSFVersion;
 
 /**
- * Created by patrick on 11.01.17.
+ * Simple example that shows how to convert all BScans of a file into png images
  * (c) Patrick Scheibe 2017
  */
 public class ExportBScans {
 
-    private static Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.ExportBScans");
+    private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.ExportBScans");
     private static final String SEPARATOR = File.separator;
 
 
@@ -63,6 +63,7 @@ public class ExportBScans {
                     ImageIO.write(scan.getImage(), "png", new File(name));
                 }
                 LOG.log(Level.INFO, "File saved");
+                hsfFile.close();
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Could not write file", e);
             }

@@ -43,6 +43,7 @@ import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.LayerNames;
 import de.halirutan.spectralis.filestructure.RectangularThicknessGrid;
 import de.halirutan.spectralis.filestructure.RetinalLayer;
+import de.halirutan.spectralis.filestructure.SLOImage;
 import de.halirutan.spectralis.filestructure.Sector;
 import de.halirutan.spectralis.filestructure.LayerSegmentation;
 
@@ -58,7 +59,9 @@ public class MmaHSF {
     private static final Expr[] EMPTY_EXPR_ARRAY = new Expr[0];
     private static final Expr RULE = new Expr(Expr.SYMBOL, "Rule");
     private static final Expr ASSOCIATION = new Expr(Expr.SYMBOL, "Association");
+    private static final Expr PARTITION = new Expr(Expr.SYMBOL, "Partition");
     private static final Expr DATE_OBJECT = new Expr(Expr.SYMBOL, "DateObject");
+    private static final Expr IMAGE = new Expr(Expr.SYMBOL, "Image");
     private static final Expr FAILED = new Expr(Expr.SYMBOL, "$FAILED");
 
     /**
@@ -103,6 +106,19 @@ public class MmaHSF {
         }
         hsfFile.close();
         return new Expr(ASSOCIATION, content.toArray(EMPTY_EXPR_ARRAY));
+    }
+
+    /**
+     * Provides the SLO image as Mathematica Image
+     * @param fileName Input file
+     * @return SLO image
+     * @throws SpectralisException When opening or reading the file failed
+     */
+    public static Expr getSLOImage(String fileName) throws SpectralisException {
+        HSFFile hsfFile = new HSFFile(new File(fileName));
+        SLOImage sloImage = hsfFile.getSLOImage();
+        hsfFile.close();
+        return sloImageToExpr(sloImage);
     }
 
     /**
@@ -253,6 +269,21 @@ public class MmaHSF {
             );
         }
         return new Expr(ASSOCIATION, layerExprs.toArray(EMPTY_EXPR_ARRAY));
+    }
+
+    private static Expr sloImageToExpr(SLOImage img) {
+        int nx = img.getWidth();
+        byte[] pixelData = img.getPixelData();
+        int[] data = new int[pixelData.length];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = pixelData[i] & 0xFF;
+        }
+
+        Expr dataExpr[] = new Expr[2];
+        dataExpr[0] = new Expr(data);
+        dataExpr[1] = new Expr(nx);
+        Expr partition = new Expr(PARTITION, dataExpr);
+        return new Expr(IMAGE, new Expr[]{partition, new Expr("Byte")});
     }
 
     private static Expr dateToExpression(LocalDateTime dateTime) {

@@ -33,7 +33,7 @@ import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.HSFVersion;
 
 /**
- * Created by patrick on 06.04.18.
+ * Simple example that displays information about an OCT scan
  * (c) Patrick Scheibe 2018
  */
 public class InformationPrinter {

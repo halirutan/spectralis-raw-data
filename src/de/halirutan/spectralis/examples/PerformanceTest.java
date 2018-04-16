@@ -35,7 +35,7 @@ import de.halirutan.spectralis.filestructure.HSFFile;
 import de.halirutan.spectralis.filestructure.HSFVersion;
 
 /**
- * Does nothing more than accessing all data from a scan
+ * Simple example that does nothing more than accessing all data from a scan
  * Created by patrick on 06.04.18.
  * (c) Patrick Scheibe 2018
  */
@@ -50,7 +50,7 @@ public class PerformanceTest {
     }
 
     public static void main(String[] args) {
-        if (args.length == 0) {
+        if (args.length != 1) {
             LOG.log(Level.WARNING,"No input file given");
             return;
         }
@@ -58,7 +58,6 @@ public class PerformanceTest {
         if (file.exists() && file.canRead() && (HSFVersion.readVersion(file) != HSFVersion.INVALID)) {
             try {
                 HSFFile hsfFile = new HSFFile(file);
-                FileInfo info = hsfFile.getInfo();
                 List<BScanInfo> allBScanInfos = hsfFile.getBScanInfo();
                 List<BScanData> allBScanData = hsfFile.getBScanData();
                 format("File Name", file.getName());

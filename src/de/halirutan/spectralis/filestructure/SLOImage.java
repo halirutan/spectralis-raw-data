@@ -52,4 +52,12 @@ public class SLOImage  {
         img.setData(Raster.createRaster(img.getSampleModel(), new DataBufferByte(pixelData, pixelData.length), null));
         return img;
     }
+
+    public int getWidth() {
+        return myWidth;
+    }
+
+    public int getHeight() {
+        return myHeight;
+    }
 }

@@ -33,15 +33,16 @@ import de.halirutan.spectralis.filestructure.Grid;
 import de.halirutan.spectralis.filestructure.HSFFile;
 
 /**
- * Created by patrick on 14.02.18.
+ * Simple example that shows how to access the grid of an OCT scan.
  * (c) Patrick Scheibe 2018
  */
 public class GridMinPrinter {
 
-    private static Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.GridMinPrinter");
+    private static final Logger LOG = Logger.getLogger("#de.halirutan.spectralis.examples.GridMinPrinter");
 
     public static void main(String[] args) {
-        if (args.length < 1) {
+        if (args.length != 1) {
+            LOG.log(Level.WARNING, "Please specify the path to the vol file");
             return;
         }
         try {
@@ -58,6 +59,7 @@ public class GridMinPrinter {
                     System.out.println("Central Max: " + g.getMaxCentralThickness() * 1000);
                 }
             }
+            hsfFile.close();
         } catch (SpectralisException e) {
             LOG.log(Level.WARNING, "Error reading Grid", e);
         }
