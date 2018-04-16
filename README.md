@@ -1,6 +1,6 @@
 # Spectralis Raw Data Import Library
 
-This is a Java library that reads Optical Coherence Tomography (OCT) files that were created with the *Raw data export" of the SPECTRALIS viewing software of Heidelberg Engineering.
+This is a Java library that reads Optical Coherence Tomography (OCT) files that were created with the *Raw data export* of the SPECTRALIS viewing software of Heidelberg Engineering.
 It aims to help scientists to analyze a large number of OCT scans by providing programmatically access to meta data, SLO images, scanning modes, retinal layer segmentations, and of course the scanned data itself.
 
 Each OCT scan consists of
