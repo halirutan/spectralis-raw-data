@@ -57,7 +57,7 @@ Most information are returned as `Assiciations` or as primitive tensors.
 There does not exist a Mathematica package yet, but access through `JLink` is easy enough.
 To work with it, you need the `.jar` and add it to the Mathematica class-path:
 
-```
+```mathematica
 << JLink`
 AddToClassPath["/path/to/spectralis-raw-data.jar"];
 ```
@@ -70,7 +70,7 @@ LoadJavaClass["de.halirutan.spectralis.mathematica.MmaHSF", StaticsVisible -> Tr
 
 Now, you can access all functions where you use ``MmaHSF` `` as context:
 
-```
+```mathematica
 file = "/path/to/file-with-layers.vol";
 invalidEntry = MmaHSF`getInvalidFloatValue[];
 info = MmaHSF`getInfo[file];
