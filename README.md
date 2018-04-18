@@ -64,7 +64,7 @@ AddToClassPath["/path/to/spectralis-raw-data.jar"];
 
 Then, you load the interface class and make the static functions visible
 
-```
+```mathematica
 LoadJavaClass["de.halirutan.spectralis.mathematica.MmaHSF", StaticsVisible -> True]
 ```
 
@@ -88,4 +88,4 @@ With[
  ]
 ```
 
-![layers](http://i.stack.imgur.com/8BMwO.png)
+![Layers](http://i.stack.imgur.com/tOCly.png)
