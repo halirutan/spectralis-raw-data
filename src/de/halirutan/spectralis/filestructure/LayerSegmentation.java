@@ -33,6 +33,11 @@ import de.halirutan.spectralis.SpectralisException;
 /**
  * Provides access to the segmentation of different retinal layers that are accessible in each OCT BScan.
  * Use {@link HSFFile#getLayerSegmentation()} to access this information.
+ *
+ * @apiNote Be aware that usually not all layers that are provided are indeed segmented by the OCT software.
+ * For those {@link RetinalLayer}, all entries contain the value {@link HSFFile#INVALID_FLOAT_VALUE}. Often times,
+ * even for successfully segmented layers, there are some points near the start and the end that are invalid and need
+ * to be handled.
  */
 public class LayerSegmentation {
 
