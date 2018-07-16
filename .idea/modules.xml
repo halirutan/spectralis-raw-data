@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Spectralis/Spectralis.iml" filepath="$PROJECT_DIR$/Spectralis/Spectralis.iml" />
       <module fileurl="file://$PROJECT_DIR$/spectralis-raw-data.iml" filepath="$PROJECT_DIR$/spectralis-raw-data.iml" />
     </modules>
   </component>
