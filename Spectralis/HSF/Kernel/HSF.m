@@ -15,7 +15,16 @@
 BeginPackage["HSF`"];
 
 $HSFInvalid::usage = "$HSFInvalid is a numerical value used to indicate that e.g. a segmentation-value is invalid.";
-
+HSFFileQ::usage = "HSFFileQ[file] returns true if the file exists and has the extension \"vol\"";
+HSFInfo::usage = "HSFInfo[file] reads the file header information from the OCT scan.";
+HSFBScanInfo::usage = "HSFBScanInfo[file] reads the BScan header information of all BScans." <>
+    "HSFBScanInfo[file, index] reads the BScan header information at index.";
+HSFSloImage::usage = "HSFSloImage[file] reads the SLO image from the OCT scan.";
+HSFBScanData::usage = "HSFBScanData[file] reads the header information of all BScans.\n" <>
+    "HSFBScanData[file, index] reads the header information of BScan at index.";
+HSFGrid::usage = "HSFGrid[file, id] reads the measurement grid if available in file. Possible settings for id are 1 or 2.";
+HSFLayerSegmentation::usage = "HSFLayerSegmentation[file] reads all segmented retinal layers from the OCT scan." <>
+    "HSFLayerSegmentation[file, index] reads the layer segmentation at index.";
 
 Begin["`Private`"];
 
@@ -23,40 +32,40 @@ $clazz = "de.halirutan.spectralis.mathematica.MmaHSF";
 Needs["JLink`"];
 JLink`LoadJavaClass[$clazz];
 
-volFileQ[file_String] := FileExistsQ[file] && Not[DirectoryQ[file]];
-volFileQ[___] := False;
+HSFFileQ[file_String] := TrueQ[FileExistsQ[file] && Not[DirectoryQ[file]] && FileExtension[file] === "vol"];
+HSFFileQ[___] := False;
 
 $HSFInvalid = MmaHSF`getInvalidFloatValue[];
 
-HSFInfo[file_?volFileQ] := MathematicaInterface`getInfo[file];
+HSFInfo[file_?HSFFileQ] := MmaHSF`getInfo[file];
 
-HSFSloImage[file_?volFileQ] := MathematicaInterface`getSLOImage[file];
+HSFSloImage[file_?HSFFileQ] := MmaHSF`getSLOImage[file];
 
-HSFBScanInfo[file_?volFileQ, index_ : All] := Switch[index,
+HSFBScanInfo[file_?HSFFileQ, index_ : All] := Switch[index,
   All,
-  MathematicaInterface`getBScanInfo[file],
+  MmaHSF`getBScanInfo[file],
   _Integer,
-  MathematicaInterface`getBScanInfo[file, index],
+  MmaHSF`getBScanInfo[file, index],
   _,
   $Failed
 ];
 
-HSFLayerSegmentation[file_?volFileQ, index_ : All] := Switch[index,
+HSFLayerSegmentation[file_?HSFFileQ, index_ : All] := Switch[index,
   All,
-  MathematicaInterface`getLayerSegmentation[file],
+  MmaHSF`getLayerSegmentation[file],
   _Integer,
-  MathematicaInterface`getLayerSegmentation[file, index],
+  MmaHSF`getLayerSegmentation[file, index],
   _,
   $Failed
 ];
 
-HSFGrid[file_?volFileQ, index : (1 | 2)] := MathematicaInterface`getGrid[file, index];
+HSFGrid[file_?HSFFileQ, index : (1 | 2)] := MmaHSF`getGrid[file, index];
 
-HSFBScanData[file_?volFileQ, index_ : All] := Switch[index,
+HSFBScanData[file_?HSFFileQ, index_ : All] := Switch[index,
   All,
-  MathematicaInterface`getBScanData[file],
+  MmaHSF`getBScanData[file],
   _Integer,
-  MathematicaInterface`getBScanData[file, index],
+  MmaHSF`getBScanData[file, index],
   _,
   $Failed
 ];
