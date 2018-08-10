@@ -22,6 +22,7 @@ HSFBScanInfo::usage = "HSFBScanInfo[file] reads the BScan header information of 
 HSFSloImage::usage = "HSFSloImage[file] reads the SLO image from the OCT scan.";
 HSFBScanData::usage = "HSFBScanData[file] reads the header information of all BScans.\n" <>
     "HSFBScanData[file, index] reads the header information of BScan at index.";
+HSFBScanImage::usage = "HSFBScanImage[file, index] creates an image of the B-scan at index.";
 HSFGrid::usage = "HSFGrid[file, id] reads the measurement grid if available in file. Possible settings for id are 1 or 2.";
 HSFLayerSegmentation::usage = "HSFLayerSegmentation[file] reads all segmented retinal layers from the OCT scan." <>
     "HSFLayerSegmentation[file, index] reads the layer segmentation at index.";
@@ -69,6 +70,8 @@ HSFBScanData[file_?HSFFileQ, index_ : All] := Switch[index,
   _,
   $Failed
 ];
+
+HSFBScanImage[file_?HSFFileQ, index_Integer] := Image[MmaHSF`getBScanData[file, index]^0.25]  /; 1 <= index <=  MmaHSF`getInfo[file]["NumBScans"];
 
 End[]; (* `Private` *)
 

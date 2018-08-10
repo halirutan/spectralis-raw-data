@@ -5,7 +5,7 @@
 
 Paclet[
   Name -> "HSF",
-  Version -> "1.1",
+  Version -> "1.2",
   MathematicaVersion -> "11+",
   Description -> "Package for importing Spectralis Raw Data",
   Creator -> "Patrick Scheibe",

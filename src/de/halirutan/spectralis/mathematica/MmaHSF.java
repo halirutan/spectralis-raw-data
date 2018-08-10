@@ -182,7 +182,7 @@ public class MmaHSF {
      */
     public static float[][] getBScanData(String fileName, int index) throws SpectralisException {
         HSFFile hsfFile = new HSFFile(new File(fileName));
-        BScanData bScan = hsfFile.getBScanData(index);
+        BScanData bScan = hsfFile.getBScanData(index - 1);
         hsfFile.close();
         return bScan.getContents();
     }
