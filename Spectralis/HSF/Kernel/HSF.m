@@ -6,7 +6,6 @@
 (* :Author: patrick *)
 (* :Date: 2018-04-27 *)
 
-(* :Package Version: 0.1 *)
 (* :Mathematica Version: 11 *)
 (* :Copyright: (c) 2018 patrick *)
 (* :Keywords: *)

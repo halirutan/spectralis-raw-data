@@ -91,6 +91,7 @@ public class MmaHSF {
         content.add(makeRule("ScanPattern", new Expr(info.getScanPattern())));
         content.add(makeRule("Id", new Expr(info.getId())));
         content.add(makeRule("ExamTime", dateToExpression(info.getExamTime())));
+        content.add(makeRule("DOB", dateToExpression(info.getDob())));
         content.add(makeRule("ReferenceId", new Expr(info.getReferenceId())));
 
         try {
@@ -279,7 +280,7 @@ public class MmaHSF {
             data[i] = pixelData[i] & 0xFF;
         }
 
-        Expr dataExpr[] = new Expr[2];
+        Expr[] dataExpr = new Expr[2];
         dataExpr[0] = new Expr(data);
         dataExpr[1] = new Expr(nx);
         Expr partition = new Expr(PARTITION, dataExpr);
