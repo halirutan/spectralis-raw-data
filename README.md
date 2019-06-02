@@ -52,31 +52,50 @@ One of the examples shows how you can access the retinal layer segmentation and 
 
 ![Imgur](https://i.imgur.com/SQL0msS.png)
 
-# Mathematica usage
+# Mathematica package
 
-For Mathematica users, the library contains an interface class `de.halirutan.spectralis.mathematica.MmaHSF` that exposes all features through static functions.
+For Mathematica users, the library contains a package which interfaces the underlying Java library and exposes many features through static functions.
 Most information are returned as `Assiciations` or as primitive tensors.
-There does not exist a Mathematica package yet, but access through `JLink` is easy enough.
-To work with it, you need the `.jar` and add it to the Mathematica class-path:
+You can install and load the package in Mathematica 11 directly from the latest release on GitHub:
 
 ```mathematica
-<< JLink`
-AddToClassPath["/path/to/spectralis-raw-data.jar"];
+PacletInstall["https://github.com/halirutan/spectralis-raw-data/releases/download/v1.2/HSF-1.2.paclet"];
+
+<<HSF`
 ```
 
-Then, you load the interface class and make the static functions visible
+The repository contains sample scans that can be used for testing.
+For instance, to check the meta-data of a scan, access the image of the 20th B-scan,
+and check the meta-data of this B-scan, you can use:
 
 ```mathematica
-LoadJavaClass["de.halirutan.spectralis.mathematica.MmaHSF", StaticsVisible -> True]
+file = "/path/to/spectralis-raw-data/test-data/layers.vol";
+
+HSFInfo[file]
+HSFBScanImage[file, 20]
+HSFBScanInfo[file, 20]
 ```
 
-Now, you can access all functions where you use ``MmaHSF` `` as context:
+If loading information from a file results in an error message which indicates that the
+link to Java died, then this is most likely happening because of insufficient memory available to the
+Java virtual machine.
+Please use, e.g. 
+
+```mathematica
+<< JLink`;
+ReinstallJava[JVMArguments -> "-Xmx2048m"];
+```
+
+**before** loading the `HSF` package to increase the memory.
+
+Here is an example which uses the `file-with-layers.vol` sample-file from the repository to plot the containing
+retinal layers.
 
 ```mathematica
 file = "/path/to/file-with-layers.vol";
-invalidEntry = MmaHSF`getInvalidFloatValue[];
-info = MmaHSF`getInfo[file];
-layers = MmaHSF`getLayerSegmentation[file, 50];
+invalidEntry = $HSFInvalid;
+info = HSFInfo[file];
+layers = HSFLayerSegmentation[file, 50];
 
 With[
   {
@@ -92,5 +111,11 @@ With[
 
 ![Layers](http://i.stack.imgur.com/tOCly.png)
 
-# Citing the Spectralis Raw Data library
+To see which functions are provided by the `HSF` package, please see the usage
+messages at the top of the [`HSF.m`](https://github.com/halirutan/spectralis-raw-data/blob/master/Spectralis/HSF/Kernel/HSF.m)
+package.
+If you run into issues or strange behavior, please [open a new issue](https://github.com/halirutan/spectralis-raw-data/issues/new).
 
+# Citing this library in science
+
+* Patrick Scheibe. *Spectralis Raw Data Import Library*, 2019, Version v1.2, http://doi.org/10.5281/zenodo.3236491
